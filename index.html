@@ -554,7 +554,7 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
     var result=await res.json();
     var token=(result[0]&&result[0].token)?result[0].token:'';
     var modifLink='https://sarah-hbd.vercel.app/mon-invitation?token='+token;
-    var waMsg='Voici mon lien pour modifier ma presence a la fete de Sarah%0AValable jusqu%27au 17 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
+    var waMsg=encodeURIComponent(modifLink);
     document.getElementById('rsvpForm').style.display='none';
     var sm=document.getElementById('successMsg');sm.style.display='block';
     document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, votre pr&#233;sence est confirm&#233;e ! &#x1F389;<br>On vous attend pour f&#234;ter la petite princesse Sarah &#x1F451;';
