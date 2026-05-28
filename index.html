@@ -553,7 +553,7 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
     if(!res.ok){throw new Error(await res.text());}
     var result=await res.json();
     var token=(result[0]&&result[0].token)?result[0].token:'';
-    var modifLink='https://sarah-hbd.vercel.app/mon-invitation?token='+token;
+    var modifLink='https://sarah-hdb-silk.vercel.app/mon-invitation?token='+token;
     var waMsg=encodeURIComponent(modifLink);
     document.getElementById('rsvpForm').style.display='none';
     var sm=document.getElementById('successMsg');sm.style.display='block';
