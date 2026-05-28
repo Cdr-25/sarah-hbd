@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sarah.HBD · Dashboard Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:       #e8809e;
+  --rose-deep:  #c95e7e;
+  --rose-pale:  #fce8ef;
+  --gold:       #c9a85c;
+  --gold-lt:    #f2ddb5;
+  --cream:      #fdf6f0;
+  --white:      #ffffff;
+  --ink:        #2c1f26;
+  --muted:      #a08890;
+  --green:      #4caf7d;
+  --green-pale: #e8f5ee;
+  --red:        #e57373;
+  --red-pale:   #fdecea;
+  --border:     rgba(232,128,158,.18);
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { overflow-x:hidden; }
+body {
+  font-family:'Jost',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+/* ── LOGIN ── */
+.login-screen {
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#fff5f8 0%,#fce8ef 50%,#fdf6f0 100%);
+  padding:20px;
+}
+.login-box {
+  background:white;
+  border-radius:24px;
+  padding:48px 40px;
+  width:100%;max-width:400px;
+  box-shadow:0 20px 60px rgba(232,128,158,.15);
+  text-align:center;
+}
+.login-crown { font-size:2.5rem; margin-bottom:12px; }
+.login-box h1 {
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;color:var(--rose-deep);
+  margin-bottom:6px;
+}
+.login-box p { color:var(--muted);font-size:.88rem;margin-bottom:28px; }
+.login-field { margin-bottom:16px;text-align:left; }
+.login-field label {
+  display:block;font-size:.68rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;
+}
+.login-field input {
+  width:100%;padding:13px 16px;
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  font-family:'Jost',sans-serif;font-size:.95rem;
+  color:var(--ink);background:var(--cream);
+  transition:all .25s;
+}
+.login-field input:focus {
+  outline:none;border-color:var(--rose);
+  box-shadow:0 0 0 4px rgba(232,128,158,.1);
+  background:white;
+}
+.btn-login {
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--rose-deep),var(--rose));
+  color:white;border:none;border-radius:12px;
+  font-family:'Jost',sans-serif;font-size:.88rem;
+  font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;
+  box-shadow:0 8px 24px rgba(201,94,126,.3);
+  margin-top:8px;
+}
+.btn-login:hover { transform:translateY(-2px);box-shadow:0 12px 32px rgba(201,94,126,.4); }
+.login-error {
+  color:var(--red);font-size:.82rem;
+  margin-top:10px;display:none;
+}
+
+/* ── APP ── */
+.app { display:none; }
+
+/* Header */
+.dash-header {
+  background:white;
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 16px rgba(232,128,158,.08);
+}
+.dash-logo {
+  display:flex;align-items:center;gap:10px;
+}
+.dash-logo-icon {
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--rose-deep),var(--rose));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+}
+.dash-logo-text {
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;color:var(--rose-deep);font-weight:700;
+}
+.dash-logo-sub { font-size:.7rem;color:var(--muted);display:block;line-height:1; }
+.header-actions { display:flex;align-items:center;gap:12px; }
+.btn-refresh {
+  display:flex;align-items:center;gap:6px;
+  padding:8px 16px;
+  border:1.5px solid var(--border);border-radius:30px;
+  background:transparent;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.78rem;
+  color:var(--muted);transition:all .25s;
+}
+.btn-refresh:hover { border-color:var(--rose);color:var(--rose-deep); }
+.btn-refresh.spinning .icon { animation:spin .8s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.btn-logout {
+  padding:8px 16px;
+  border:1.5px solid var(--border);border-radius:30px;
+  background:transparent;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.78rem;
+  color:var(--muted);transition:all .25s;
+}
+.btn-logout:hover { border-color:var(--red);color:var(--red); }
+
+/* Main */
+.dash-main { padding:28px; max-width:1200px; margin:0 auto; }
+
+/* Stats */
+.stats-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:16px;margin-bottom:28px;
+}
+.stat-card {
+  background:white;border-radius:20px;
+  padding:22px 24px;
+  border:1.5px solid var(--border);
+  transition:transform .25s,box-shadow .25s;
+  position:relative;overflow:hidden;
+}
+.stat-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.stat-card.total::before  { background:linear-gradient(90deg,var(--rose),var(--gold)); }
+.stat-card.present::before{ background:linear-gradient(90deg,var(--green),#81c784); }
+.stat-card.adults::before { background:linear-gradient(90deg,var(--gold),var(--gold-lt)); }
+.stat-card.kids::before   { background:linear-gradient(90deg,var(--rose-deep),var(--rose)); }
+.stat-card:hover { transform:translateY(-3px);box-shadow:0 12px 30px rgba(232,128,158,.12); }
+.stat-icon { font-size:1.6rem;margin-bottom:8px; }
+.stat-label { font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px; }
+.stat-value { font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--ink);line-height:1; }
+.stat-sub { font-size:.75rem;color:var(--muted);margin-top:4px; }
+
+/* Pays breakdown */
+.section-title {
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;color:var(--ink);
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-title::after {
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,var(--border),transparent);
+}
+
+.countries-grid {
+  display:flex;flex-wrap:wrap;gap:10px;
+  margin-bottom:28px;
+}
+.country-chip {
+  display:flex;align-items:center;gap:7px;
+  background:white;border:1.5px solid var(--border);
+  border-radius:30px;padding:7px 14px;
+  font-size:.82rem;font-weight:500;
+  transition:all .25s;
+}
+.country-chip:hover { border-color:var(--rose);box-shadow:0 4px 12px rgba(232,128,158,.15); }
+.country-chip .count {
+  background:var(--rose-pale);
+  color:var(--rose-deep);
+  font-weight:700;font-size:.75rem;
+  padding:2px 8px;border-radius:20px;
+}
+
+/* Table */
+.table-wrap {
+  background:white;border-radius:20px;
+  border:1.5px solid var(--border);
+  overflow:hidden;margin-bottom:28px;
+}
+.table-head {
+  padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  background:var(--cream);
+}
+.table-search {
+  display:flex;align-items:center;gap:8px;
+  background:white;border:1.5px solid var(--border);
+  border-radius:30px;padding:7px 14px;
+  font-size:.85rem;
+}
+.table-search input {
+  border:none;outline:none;
+  font-family:'Jost',sans-serif;font-size:.85rem;
+  color:var(--ink);background:transparent;width:180px;
+}
+.table-search input::placeholder { color:var(--muted); }
+.table-count { font-size:.8rem;color:var(--muted); }
+
+.table-scroll { overflow-x:auto; }
+table { width:100%;border-collapse:collapse; }
+thead tr { background:var(--cream); }
+th {
+  padding:12px 18px;text-align:left;
+  font-size:.65rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;
+  border-bottom:1px solid var(--border);
+}
+td {
+  padding:14px 18px;
+  border-bottom:1px solid rgba(232,128,158,.08);
+  font-size:.88rem;vertical-align:middle;
+}
+tbody tr:last-child td { border-bottom:none; }
+tbody tr { transition:background .2s; }
+tbody tr:hover { background:rgba(252,232,239,.3); }
+
+.badge {
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:20px;
+  font-size:.72rem;font-weight:600;
+}
+.badge.present { background:var(--green-pale);color:var(--green); }
+.badge.seul    { background:var(--rose-pale);color:var(--rose-deep); }
+.badge.groupe  { background:var(--gold-lt);color:#8a6820; }
+
+.name-cell { font-weight:600; }
+.name-cell .initials {
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--rose-pale),var(--gold-lt));
+  color:var(--rose-deep);font-weight:700;font-size:.8rem;
+  margin-right:10px;flex-shrink:0;
+}
+.name-wrap { display:flex;align-items:center; }
+.msg-cell { color:var(--muted);font-style:italic;font-size:.82rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.date-cell { color:var(--muted);font-size:.78rem;white-space:nowrap; }
+
+/* Empty state */
+.empty-state {
+  padding:60px 20px;text-align:center;
+}
+.empty-state .empty-icon { font-size:3rem;margin-bottom:12px; }
+.empty-state p { color:var(--muted);font-size:.9rem; }
+
+/* Loading */
+.loading {
+  padding:60px 20px;text-align:center;
+  color:var(--muted);font-size:.9rem;
+}
+.loading-dots span {
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--rose);margin:0 3px;
+  animation:dot-bounce .8s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes dot-bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+/* Toast */
+.toast {
+  position:fixed;bottom:24px;right:24px;
+  background:var(--ink);color:white;
+  padding:12px 20px;border-radius:12px;
+  font-size:.85rem;z-index:999;
+  transform:translateY(80px);opacity:0;
+  transition:all .35s cubic-bezier(.34,1.4,.64,1);
+  box-shadow:0 8px 24px rgba(44,31,38,.2);
+}
+.toast.show { transform:translateY(0);opacity:1; }
+.toast.success { background:var(--green); }
+.toast.error   { background:var(--red); }
+
+/* Responsive */
+@media(max-width:600px){
+  .dash-main { padding:16px; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .dash-header { padding:0 16px; }
+  .dash-logo-text { font-size:.95rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-crown">👑</div>
+    <h1>Espace Admin</h1>
+    <p>Tableau de bord · NJAMEN SARAH · 1 an</p>
+
+    <div class="login-field">
+      <label>Mot de passe</label>
+      <input type="password" id="loginPassword" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Accéder au dashboard</button>
+    <p class="login-error" id="loginError">Mot de passe incorrect</p>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="app" id="app">
+
+  <!-- Header -->
+  <header class="dash-header">
+    <div class="dash-logo">
+      <div class="dash-logo-icon">👶</div>
+      <div>
+        <span class="dash-logo-text">Sarah.HBD</span>
+        <span class="dash-logo-sub">NJAMEN SARAH · 1 an · 18 juillet 2026</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh" id="btnRefresh" onclick="loadData()">
+        <span class="icon">↻</span> Actualiser
+      </button>
+      <button class="btn-logout" onclick="doLogout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="dash-main">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-icon">✉️</div>
+        <div class="stat-label">Réponses reçues</div>
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-sub">invités ayant répondu</div>
+      </div>
+      <div class="stat-card present">
+        <div class="stat-icon">🎉</div>
+        <div class="stat-label">Présences confirmées</div>
+        <div class="stat-value" id="statPresent">—</div>
+        <div class="stat-sub">personnes attendues</div>
+      </div>
+      <div class="stat-card adults">
+        <div class="stat-icon">👤</div>
+        <div class="stat-label">Total adultes</div>
+        <div class="stat-value" id="statAdults">—</div>
+        <div class="stat-sub">adultes confirmés</div>
+      </div>
+      <div class="stat-card kids">
+        <div class="stat-icon">🧒</div>
+        <div class="stat-label">Total enfants</div>
+        <div class="stat-value" id="statKids">—</div>
+        <div class="stat-sub">enfants confirmés</div>
+      </div>
+
+      <!-- TOTAL INVITES -->
+      <div class="stat-card" style="grid-column:1/-1;background:linear-gradient(135deg,#fff0f5,#fce8ef);border:2px solid var(--rose);">
+        <div class="stat-icon">&#x1F385;</div>
+        <div class="stat-label" style="color:var(--rose-deep);">Total invit&#233;s attendus</div>
+        <div class="stat-value" id="statTotalGuests" style="font-size:3rem;color:var(--rose-deep);">&#x2014;</div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Messages pour Sarah -->
+    <div id="messagesSection" style="display:none;margin-bottom:28px;">
+      <div class="section-title">💌 Messages pour Sarah</div>
+      <div id="messagesList" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+
+    <!-- Table invités -->
+    <div class="table-wrap">
+      <div class="table-head">
+        <div class="section-title" style="margin:0">📋 Liste des invités</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="table-search">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="Rechercher…" oninput="filterTable()">
+          </div>
+          <span class="table-count" id="tableCount"></span>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Invité</th>
+              <th>Statut</th>
+              <th>Groupe</th>
+              <th>Adultes</th>
+              <th>Enfants</th>
+              <th>Message</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7">
+              <div class="loading">
+                <div class="loading-dots"><span></span><span></span><span></span></div>
+                <p style="margin-top:10px;">Chargement…</p>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══ CONFIG ═══ */
+const SUPABASE_URL = 'https://xbthhseeqidsnmvnfaya.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhidGhoc2VlcWlkc25tdm5mYXlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODI5MzgsImV4cCI6MjA5NTM1ODkzOH0.tQrDeZHY5GwnoUq47T8JWalpJBC0bzfaCZzF3z5jU1I';
+const ADMIN_PASS   = 'sarah2026';  // ← Change ce mot de passe !
+
+let allData = [];
+
+/* ═══ LOGIN ═══ */
+function doLogin(){
+  const pw = document.getElementById('loginPassword').value;
+  if(pw === ADMIN_PASS){
+    sessionStorage.setItem('sarah_admin', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadData();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPassword').style.borderColor = 'var(--red)';
+    setTimeout(()=>{
+      document.getElementById('loginError').style.display='none';
+      document.getElementById('loginPassword').style.borderColor='';
+    }, 2500);
+  }
+}
+function doLogout(){
+  sessionStorage.removeItem('sarah_admin');
+  location.reload();
+}
+// Auto-login si session active
+if(sessionStorage.getItem('sarah_admin')==='1'){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+}
+
+/* ═══ TOAST ═══ */
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>{ t.className='toast '+type; }, 3500);
+}
+
+/* ═══ FETCH DATA ═══ */
+async function loadData(){
+  const btn = document.getElementById('btnRefresh');
+  btn.classList.add('spinning');
+
+  try {
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/rsvp?select=*&order=created_at.desc',
+      {
+        headers:{
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY
+        }
+      }
+    );
+    if(!res.ok) throw new Error(await res.text());
+    allData = await res.json();
+    renderAll(allData);
+    toast('Données actualisées ✓', 'success');
+  } catch(e){
+    console.error(e);
+    toast('Erreur de chargement', 'error');
+  } finally {
+    btn.classList.remove('spinning');
+  }
+}
+
+/* ═══ RENDER ═══ */
+function renderAll(data){
+  // Stats
+  const total   = data.length;
+  const present = data.filter(r=>r.presence==='oui').length;
+  const adults  = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_adultes||1),0);
+  const kids    = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_enfants||0),0);
+
+  animCount('statTotal',   total);
+  animCount('statPresent', present);
+  animCount('statAdults',  adults);
+  animCount('statKids',    kids);
+
+  // Messages
+  const msgs = data.filter(r=>r.message && r.message.trim());
+  const msgSection = document.getElementById('messagesSection');
+  if(msgs.length > 0){
+    msgSection.style.display = 'block';
+    document.getElementById('messagesList').innerHTML = msgs.map(r=>`
+      <div style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rose-pale),var(--gold-lt));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--rose-deep);font-size:.8rem;flex-shrink:0;">${r.prenom[0]}${r.nom[0]}</div>
+        <div>
+          <div style="font-weight:600;font-size:.88rem;margin-bottom:3px;">${r.prenom} ${r.nom}</div>
+          <div style="color:var(--muted);font-style:italic;font-size:.85rem;">« ${r.message} »</div>
+        </div>
+      </div>
+    `).join('');
+  } else {
+    msgSection.style.display = 'none';
+  }
+
+  // Table
+  renderTable(data);
+  document.getElementById('tableCount').textContent = `${data.length} invité${data.length>1?'s':''}`;
+}
+
+function renderTable(data){
+  const tbody = document.getElementById('tableBody');
+  if(data.length === 0){
+    tbody.innerHTML = `<tr><td colspan="7">
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>Aucune réponse pour le moment.<br>Partagez le lien d'invitation !</p>
+      </div>
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(r => {
+    const initials = (r.prenom[0]||'?') + (r.nom[0]||'?');
+    const dateStr  = r.created_at
+      ? new Date(r.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
+      : '—';
+    const groupBadge = r.accompagne==='oui'
+      ? '<span class="badge groupe">👨‍👩‍👧‍👦 Groupe</span>'
+      : '<span class="badge seul">🙋 Seul·e</span>';
+    const msgCell = r.message
+      ? `<span title="${r.message}">${r.message.length>35 ? r.message.slice(0,35)+'…' : r.message}</span>`
+      : '<span style="color:var(--border)">—</span>';
+
+    return `<tr>
+      <td>
+        <span class="name-cell">${r.prenom} ${r.nom.toUpperCase()}</span>
+      </td>
+      <td><span class="badge present">✓ Confirmé</span></td>
+      <td>${groupBadge}</td>
+      <td style="font-weight:600;color:var(--gold);">${r.nb_adultes || 1}</td>
+      <td style="font-weight:600;color:var(--rose-deep);">${r.nb_enfants || 0}</td>
+      <td class="msg-cell">${msgCell}</td>
+      <td class="date-cell">${dateStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══ SEARCH ═══ */
+function filterTable(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allData.filter(r=>
+    (r.prenom+' '+r.nom).toLowerCase().includes(q) ||
+    (r.message||'').toLowerCase().includes(q)
+  );
+  renderTable(filtered);
+  document.getElementById('tableCount').textContent =
+    `${filtered.length} / ${allData.length} invité${allData.length>1?'s':''}`;
+}
+
+/* ═══ ANIM COMPTEUR ═══ */
+function animCount(id, target){
+  const el = document.getElementById(id);
+  let current = 0;
+  const step  = Math.ceil(target / 25);
+  const timer = setInterval(()=>{
+    current = Math.min(current + step, target);
+    el.textContent = current;
+    if(current >= target) clearInterval(timer);
+  }, 40);
+}
+
+/* Auto load si déjà connecté */
+if(sessionStorage.getItem('sarah_admin')==='1') loadData();
+</script>
+
+</body>
+</html>
