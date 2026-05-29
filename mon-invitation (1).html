@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Invitation · Njamen Atcheute Sarah · 1 an</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:      #e8809e;
+  --rose-deep: #c95e7e;
+  --rose-pale: #fce8ef;
+  --rose-bg:   #fff5f8;
+  --gold:      #c9a85c;
+  --gold-lt:   #f2ddb5;
+  --cream:     #fdf6f0;
+  --white:     #ffffff;
+  --ink:       #2c1f26;
+  --muted:     #a08890;
+  --green:     #4caf7d;
+  --red:       #e57373;
+  --red-pale:  #fdecea;
+  --border:    rgba(232,128,158,.22);
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Jost',sans-serif;
+  background:var(--rose-bg);
+  color:var(--ink);
+  min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+  padding:40px 20px 60px;
+}
+
+/* ── LOADING / ERROR / CLOSED ── */
+.screen {
+  display:none;
+  flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:40px 20px;
+  max-width:480px; width:100%;
+  min-height:60vh;
+}
+.screen.active { display:flex; }
+.screen-emoji { font-size:3.5rem; margin-bottom:16px; }
+.screen h2 {
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem; color:var(--rose-deep); margin-bottom:10px;
+}
+.screen p { color:var(--muted); line-height:1.7; font-size:.92rem; }
+.loading-dots { margin:20px 0; }
+.loading-dots span {
+  display:inline-block; width:9px; height:9px; border-radius:50%;
+  background:var(--rose); margin:0 3px;
+  animation:dot .8s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2){animation-delay:.15s}
+.loading-dots span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+
+/* ── CARTE PRINCIPALE ── */
+.card {
+  display:none;
+  background:white;
+  border-radius:28px;
+  padding:36px 32px;
+  width:100%; max-width:520px;
+  box-shadow:0 20px 60px rgba(232,128,158,.13);
+  border:1.5px solid var(--border);
+  animation:card-in .7s cubic-bezier(.34,1.3,.64,1) both;
+}
+.card.active { display:block; }
+@keyframes card-in {
+  from{opacity:0;transform:translateY(30px) scale(.97)}
+  to  {opacity:1;transform:translateY(0)    scale(1)}
+}
+
+/* Header de la carte */
+.card-header { text-align:center; margin-bottom:28px; }
+.card-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  background:var(--rose-pale); color:var(--rose-deep);
+  font-size:.7rem; font-weight:600; letter-spacing:.15em;
+  text-transform:uppercase; padding:5px 14px; border-radius:20px;
+  margin-bottom:12px;
+}
+.card-header h1 {
+  font-family:'Playfair Display',serif;
+  font-size:2rem; font-weight:700; color:var(--ink);
+  margin-bottom:4px;
+}
+.card-header p { color:var(--muted); font-size:.88rem; }
+
+/* Info actuelle */
+.current-info {
+  background:var(--rose-bg);
+  border:1.5px solid var(--border);
+  border-radius:16px; padding:18px 20px;
+  margin-bottom:24px;
+}
+.ci-row {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:.88rem; padding:5px 0;
+  border-bottom:1px solid rgba(232,128,158,.1);
+}
+.ci-row:last-child { border-bottom:none; }
+.ci-label { color:var(--muted); font-weight:500; }
+.ci-value { font-weight:600; color:var(--ink); }
+.ci-value.rose { color:var(--rose-deep); }
+
+/* Séparateur */
+.divider {
+  display:flex; align-items:center; gap:10px; margin:22px 0;
+}
+.divider-line { flex:1; height:1px; background:var(--border); }
+.divider span { color:var(--muted); font-size:.75rem; letter-spacing:.1em; text-transform:uppercase; }
+
+/* Champs */
+.field { margin-bottom:16px; }
+.field label {
+  display:block; font-size:.65rem; font-weight:600;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:7px;
+}
+.field input, .field select {
+  width:100%; padding:13px 16px;
+  border:1.5px solid var(--border); border-radius:13px;
+  font-family:'Jost',sans-serif; font-size:.95rem;
+  color:var(--ink); background:var(--rose-bg);
+  transition:all .25s; appearance:none;
+}
+.field input:focus, .field select:focus {
+  outline:none; border-color:var(--rose);
+  box-shadow:0 0 0 4px rgba(232,128,158,.1);
+  background:white;
+}
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media(max-width:440px){ .grid2{ grid-template-columns:1fr; } }
+
+/* Présence radios */
+.radio-group { display:flex; gap:12px; }
+.radio-opt { flex:1; cursor:pointer; }
+.radio-opt input { display:none; }
+.radio-card {
+  display:flex; flex-direction:column; align-items:center;
+  padding:16px 10px; border:1.5px solid var(--border);
+  border-radius:16px; background:var(--rose-bg);
+  transition:all .3s cubic-bezier(.34,1.3,.64,1); text-align:center;
+}
+.radio-opt input:checked + .radio-card {
+  border-color:var(--rose); background:white;
+  box-shadow:0 6px 20px rgba(232,128,158,.2);
+  transform:translateY(-2px);
+}
+.r-emoji { font-size:1.6rem; margin-bottom:6px; }
+.r-label { font-size:.82rem; font-weight:600; }
+.r-sub   { font-size:.68rem; color:var(--muted); margin-top:2px; }
+
+/* Accompagnement conditionnel */
+.cond { display:none; animation:slide-in .3s ease; }
+.cond.show { display:block; }
+.grid2.cond.show { display:grid; }
+@keyframes slide-in {
+  from{opacity:0;transform:translateY(-8px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+
+/* Boutons action */
+.btn-save {
+  width:100%; padding:16px;
+  background:linear-gradient(135deg, var(--rose-deep), var(--rose));
+  color:white; border:none; border-radius:14px;
+  font-family:'Jost',sans-serif; font-size:.88rem;
+  font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+  cursor:pointer; transition:all .3s;
+  box-shadow:0 8px 24px rgba(201,94,126,.3);
+  margin-bottom:12px;
+}
+.btn-save:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(201,94,126,.4); }
+.btn-save:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+
+.btn-cancel {
+  width:100%; padding:13px;
+  background:transparent; color:var(--red);
+  border:1.5px solid rgba(229,115,115,.35);
+  border-radius:14px; font-family:'Jost',sans-serif;
+  font-size:.82rem; font-weight:500; cursor:pointer;
+  transition:all .25s;
+}
+.btn-cancel:hover { background:var(--red-pale); border-color:var(--red); }
+
+/* Zone date limite */
+.deadline-notice {
+  display:flex; align-items:center; gap:8px;
+  background:var(--gold-lt); border-radius:10px;
+  padding:10px 14px; margin-bottom:20px;
+  font-size:.78rem; color:#7a5c1e;
+}
+
+/* Succès modif */
+.success-modif {
+  display:none; text-align:center; padding:10px 0;
+  animation:card-in .5s ease;
+}
+.success-modif .s-emoji { font-size:3rem; margin-bottom:12px; }
+.success-modif h3 {
+  font-family:'Playfair Display',serif;
+  font-size:1.7rem; color:var(--rose-deep); margin-bottom:8px;
+}
+.success-modif p { color:var(--muted); line-height:1.7; font-size:.88rem; }
+
+/* Confirm annulation */
+.confirm-cancel {
+  display:none;
+  background:var(--red-pale); border:1.5px solid rgba(229,115,115,.3);
+  border-radius:16px; padding:20px; margin-top:16px;
+  animation:slide-in .3s ease;
+}
+.confirm-cancel p {
+  font-size:.88rem; color:var(--ink); margin-bottom:14px; line-height:1.6;
+}
+.confirm-cancel-btns { display:flex; gap:10px; }
+.btn-confirm-cancel {
+  flex:1; padding:12px; background:var(--red);
+  color:white; border:none; border-radius:10px;
+  font-family:'Jost',sans-serif; font-size:.82rem;
+  font-weight:600; cursor:pointer; transition:all .25s;
+}
+.btn-confirm-cancel:hover { background:#d32f2f; }
+.btn-keep {
+  flex:1; padding:12px; background:white;
+  color:var(--muted); border:1.5px solid var(--border);
+  border-radius:10px; font-family:'Jost',sans-serif;
+  font-size:.82rem; cursor:pointer; transition:all .25s;
+}
+.btn-keep:hover { border-color:var(--rose); color:var(--rose-deep); }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(80px);
+  background:var(--ink); color:white; padding:11px 22px;
+  border-radius:30px; font-size:.83rem; z-index:999;
+  transition:all .4s cubic-bezier(.34,1.4,.64,1);
+  white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.ok  { background:var(--green); }
+.toast.err { background:var(--red); }
+
+/* Footer */
+.page-footer {
+  margin-top:32px; text-align:center;
+  font-family:'Playfair Display',serif;
+  font-style:italic; font-size:.85rem; color:var(--muted);
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div class="screen active" id="screenLoading">
+  <div class="loading-dots"><span></span><span></span><span></span></div>
+  <p style="color:var(--muted);">Chargement de votre invitation…</p>
+</div>
+
+<!-- Erreur token invalide -->
+<div class="screen" id="screenError">
+  <div class="screen-emoji">🔗</div>
+  <h2>Lien invalide</h2>
+  <p>Ce lien de modification est introuvable ou a déjà été utilisé.<br>
+     Vérifiez le lien reçu sur WhatsApp ou contactez l'organisatrice.</p>
+</div>
+
+<!-- Modifications closes -->
+<div class="screen" id="screenClosed">
+  <div class="screen-emoji">⏰</div>
+  <h2>Modifications closes</h2>
+  <p>La date limite de modification était le <strong>17 juillet 2026</strong>.<br>
+     Pour toute question, contactez directement l'organisatrice.<br><br>
+     À très bientôt pour fêter la petite Sarah 👑</p>
+</div>
+
+<!-- Annulation confirmée -->
+<div class="screen" id="screenCancelled">
+  <div class="screen-emoji">💔</div>
+  <h2>Présence annulée</h2>
+  <p>Votre présence a bien été annulée.<br>
+     Sarah sera heureuse de savoir que vous pensiez à elle 💕<br><br>
+     Si vous changez d'avis, contactez l'organisatrice.</p>
+</div>
+
+<!-- ── CARTE PRINCIPALE ── -->
+<div class="card" id="mainCard">
+
+  <div class="card-header">
+    <div class="card-badge">👑 Mon Invitation</div>
+    <h1 id="guestName">Bonjour !</h1>
+    <p>Voici votre invitation pour la fête de <strong>Njamen Atcheute Sarah</strong></p>
+  </div>
+
+  <!-- Date limite -->
+  <div class="deadline-notice">
+    ⏱️ Modifications possibles jusqu'au <strong>&nbsp;17 juillet 2026</strong>
+  </div>
+
+  <!-- Infos actuelles -->
+  <div class="current-info">
+    <div class="ci-row">
+      <span class="ci-label">Statut</span>
+      <span class="ci-value rose" id="ciStatut">—</span>
+    </div>
+    <div class="ci-row">
+      <span class="ci-label">Groupe</span>
+      <span class="ci-value" id="ciGroupe">—</span>
+    </div>
+    <div class="ci-row">
+      <span class="ci-label">Adultes</span>
+      <span class="ci-value" id="ciAdultes">—</span>
+    </div>
+    <div class="ci-row">
+      <span class="ci-label">Enfants</span>
+      <span class="ci-value" id="ciEnfants">—</span>
+    </div>
+  </div>
+
+  <!-- Formulaire modif -->
+  <div id="modifForm">
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span>Modifier</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Présence -->
+    <div class="field">
+      <label>Votre présence</label>
+      <div class="radio-group">
+        <label class="radio-opt">
+          <input type="radio" name="presence" value="oui" id="m-oui">
+          <div class="radio-card">
+            <span class="r-emoji">🎉</span>
+            <span class="r-label">Je serai là</span>
+            <span class="r-sub">présent·e</span>
+          </div>
+        </label>
+        <label class="radio-opt">
+          <input type="radio" name="presence" value="non" id="m-non">
+          <div class="radio-card">
+            <span class="r-emoji">😔</span>
+            <span class="r-label">Absent·e</span>
+            <span class="r-sub">ne peut pas venir</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Accompagnement -->
+    <div class="field cond" id="m-row-accomp">
+      <label>Accompagnement</label>
+      <div class="radio-group">
+        <label class="radio-opt">
+          <input type="radio" name="accompagne" value="seul" id="m-seul">
+          <div class="radio-card">
+            <span class="r-emoji">🙋</span>
+            <span class="r-label">Seul·e</span>
+          </div>
+        </label>
+        <label class="radio-opt">
+          <input type="radio" name="accompagne" value="oui" id="m-acc">
+          <div class="radio-card">
+            <span class="r-emoji">👨‍👩‍👧‍👦</span>
+            <span class="r-label">Accompagné·e</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Adultes + Enfants -->
+    <div class="grid2 cond" id="m-row-groupe">
+      <div class="field">
+        <label>👤 Adultes</label>
+        <input type="number" id="m-adultes" min="1" max="20" placeholder="Nombre d'adultes">
+      </div>
+      <div class="field">
+        <label>🧒 Enfants</label>
+        <input type="number" id="m-enfants" min="0" max="20" placeholder="Nombre d'enfants">
+      </div>
+    </div>
+
+    <button class="btn-save" id="btnSave" onclick="saveModif()">
+      ✓ &nbsp;Enregistrer les modifications
+    </button>
+
+    <button class="btn-cancel" onclick="toggleConfirmCancel()">
+      Annuler ma présence définitivement
+    </button>
+
+    <!-- Confirmation annulation -->
+    <div class="confirm-cancel" id="confirmCancel">
+      <p>⚠️ Êtes-vous sûr·e de vouloir annuler votre présence ?<br>
+         Cette action est irréversible.</p>
+      <div class="confirm-cancel-btns">
+        <button class="btn-confirm-cancel" onclick="doCancel()">Oui, annuler</button>
+        <button class="btn-keep" onclick="toggleConfirmCancel()">Non, garder</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Succès modification -->
+  <div class="success-modif" id="successModif">
+    <div class="s-emoji">✅</div>
+    <h3>Modifications enregistrées !</h3>
+    <p>Vos informations ont bien été mises à jour.<br>
+       On a hâte de vous accueillir pour fêter la petite Sarah 👑</p>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="page-footer">🌸 Njamen Atcheute Sarah · 1 an · 18 Juillet 2026 · Yassa, Douala 🌸</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://xbthhseeqidsnmvnfaya.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhidGhoc2VlcWlkc25tdm5mYXlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODI5MzgsImV4cCI6MjA5NTM1ODkzOH0.tQrDeZHY5GwnoUq47T8JWalpJBC0bzfaCZzF3z5jU1I';
+const DEADLINE    = new Date('2026-07-17T23:59:59');
+
+let currentData = null;
+let currentToken = null;
+
+/* ── TOAST ── */
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + type + ' show';
+  setTimeout(()=>{ t.className = 'toast ' + type; }, 3200);
+}
+
+/* ── SHOW SCREEN ── */
+function showScreen(id){
+  ['screenLoading','screenError','screenClosed','screenCancelled'].forEach(s=>{
+    document.getElementById(s).classList.remove('active');
+  });
+  document.getElementById('mainCard').classList.remove('active');
+  const el = document.getElementById(id);
+  if(el) el.classList.add('active');
+}
+function showCard(){ 
+  document.getElementById('screenLoading').classList.remove('active');
+  document.getElementById('mainCard').classList.add('active'); 
+}
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded', async () => {
+  // Vérifier deadline
+  if(new Date() > DEADLINE){
+    showScreen('screenClosed'); return;
+  }
+
+  // Récupérer token depuis URL
+  const params = new URLSearchParams(window.location.search);
+  currentToken = params.get('token');
+  if(!currentToken){ showScreen('screenError'); return; }
+  console.log('mon-invitation token', currentToken);
+
+  // Charger les données
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${currentToken}&select=*`,
+      { headers:{ 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY } }
+    );
+    const data = await res.json();
+    if(!data || data.length === 0){ showScreen('screenError'); return; }
+
+    currentData = data[0];
+    populateForm(currentData);
+    showCard();
+  } catch(e){
+    console.error(e);
+    showScreen('screenError');
+  }
+});
+
+/* ── POPULATE ── */
+function populateForm(d){
+  // Nom
+  document.getElementById('guestName').textContent = 'Bonjour, ' + d.prenom + ' !';
+
+  // Infos actuelles
+  document.getElementById('ciStatut').textContent  = d.presence === 'oui' ? '✓ Présence confirmée' : '✗ Absent·e';
+  document.getElementById('ciGroupe').textContent  = d.accompagne === 'oui' ? 'Avec accompagnants' : 'Seul·e';
+  document.getElementById('ciAdultes').textContent = d.nb_adultes || 1;
+  document.getElementById('ciEnfants').textContent = d.nb_enfants || 0;
+
+  // Pré-remplir formulaire
+  if(d.presence === 'oui') document.getElementById('m-oui').checked = true;
+  else                     document.getElementById('m-non').checked = true;
+
+  if(d.accompagne === 'oui'){
+    document.getElementById('m-acc').checked = true;
+    document.getElementById('m-adultes').value = d.nb_adultes || 1;
+    document.getElementById('m-enfants').value = d.nb_enfants || 0;
+  } else {
+    document.getElementById('m-seul').checked = true;
+  }
+
+  onPresenceChange();
+  onAccompChange();
+}
+
+/* ── RADIOS LOGIQUE ── */
+document.querySelectorAll('input[name=presence]').forEach(r=>r.addEventListener('change', onPresenceChange));
+document.querySelectorAll('input[name=accompagne]').forEach(r=>r.addEventListener('change', onAccompChange));
+
+function onPresenceChange(){
+  const present = document.getElementById('m-oui').checked;
+  document.getElementById('m-row-accomp').classList.toggle('show', present);
+  if(!present){
+    document.getElementById('m-row-groupe').classList.remove('show');
+    document.getElementById('m-seul').checked = true;
+  }
+}
+function onAccompChange(){
+  const groupe = document.getElementById('m-acc').checked;
+  document.getElementById('m-row-groupe').classList.toggle('show', groupe);
+}
+
+/* ── SAUVEGARDER ── */
+async function saveModif(){
+  if(new Date() > DEADLINE){ toast('Modifications closes depuis le 17 juillet', 'err'); return; }
+
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  btn.innerHTML = '&#x23F3;&nbsp; Enregistrement&hellip;';
+
+  const presence   = document.querySelector('input[name=presence]:checked')?.value || 'non';
+  const accompagne = document.querySelector('input[name=accompagne]:checked')?.value || 'seul';
+  const nbAdultes  = accompagne === 'oui' ? parseInt(document.getElementById('m-adultes').value || '1') : 1;
+  const nbEnfants  = accompagne === 'oui' ? parseInt(document.getElementById('m-enfants').value  || '0') : 0;
+
+  const updates = { presence, accompagne, nb_adultes: nbAdultes, nb_enfants: nbEnfants };
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${currentToken}`,
+      {
+        method: 'PATCH',
+        headers:{
+          'Content-Type':  'application/json',
+          'apikey':        SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify(updates)
+      }
+    );
+    if(!res.ok){ throw new Error(await res.text()); }
+
+    // Mettre à jour l'affichage
+    document.getElementById('ciStatut').textContent  = presence === 'oui' ? '✓ Présence confirmée' : '✗ Absent·e';
+    document.getElementById('ciGroupe').textContent  = accompagne === 'oui' ? 'Avec accompagnants' : 'Seul·e';
+    document.getElementById('ciAdultes').textContent = nbAdultes;
+    document.getElementById('ciEnfants').textContent = nbEnfants;
+
+    document.getElementById('modifForm').style.display   = 'none';
+    document.getElementById('successModif').style.display = 'block';
+    toast('Modifications enregistrées !', 'ok');
+
+  } catch(e){
+    console.error(e);
+    toast('Erreur. Réessayez.', 'err');
+    btn.disabled = false;
+    btn.innerHTML = '&#x2713;&nbsp; Enregistrer les modifications';
+  }
+}
+
+/* ── ANNULER ── */
+function toggleConfirmCancel(){
+  const box = document.getElementById('confirmCancel');
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+async function doCancel(){
+  if(new Date() > DEADLINE){ toast('Modifications closes depuis le 17 juillet', 'err'); return; }
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${currentToken}`,
+      {
+        method: 'PATCH',
+        headers:{
+          'Content-Type':  'application/json',
+          'apikey':        SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer':        'return=minimal'
+        },
+        body: JSON.stringify({ presence: 'non' })
+      }
+    );
+    if(!res.ok){ throw new Error(await res.text()); }
+    document.getElementById('mainCard').classList.remove('active');
+    showScreen('screenCancelled');
+  } catch(e){
+    console.error(e);
+    toast('Erreur. Réessayez.', 'err');
+  }
+}
+</script>
+</body>
+</html>
