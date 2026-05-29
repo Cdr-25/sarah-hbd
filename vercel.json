@@ -1,1 +1,6 @@
-{"cleanUrls":true,"trailingSlash":false,"rewrites":[{"source":"/mon-invitation","destination":"/mon-invitation.html"},{"source":"/dashboard","destination":"/dashboard.html"}]}
+{
+  "routes": [
+    { "src": "/mon-invitation", "dest": "/mon-invitation.html" },
+    { "src": "/dashboard", "dest": "/dashboard.html" }
+  ]
+}
