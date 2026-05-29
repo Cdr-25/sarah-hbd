@@ -258,7 +258,7 @@ body {
 <body>
 
 <!-- Loading -->
-<div class="screen active" id="screenLoading">
+<div class="screen" id="screenLoading" style="display:none!important;visibility:hidden!important;">
   <div class="loading-dots"><span></span><span></span><span></span></div>
   <p style="color:var(--muted);">Chargement de votre invitation…</p>
 </div>
@@ -446,7 +446,7 @@ function showScreen(id){
   const el = document.getElementById(id);
   if(el) el.classList.add('active');
 }
-function showCard(){ document.getElementById('mainCard').classList.add('active'); }
+function showCard(){ document.getElementById('screenLoading').style.display='none'; document.getElementById('mainCard').classList.add('active'); }
 
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded', async () => {
