@@ -378,7 +378,7 @@ tbody tr:hover { background:rgba(252,232,239,.3); }
       <!-- TOTAL INVITES -->
       <div class="stat-card" style="grid-column:1/-1;background:linear-gradient(135deg,#fff0f5,#fce8ef);border:2px solid var(--rose);">
         <div class="stat-icon">&#x1F385;</div>
-        <div class="stat-label" style="color:var(--rose-deep);">Total invit&#233;s attendus</div>
+        <div class="stat-label" style="color:var(--rose-deep);">Total personnes attendues</div>
         <div class="stat-value" id="statTotalGuests" style="font-size:3rem;color:var(--rose-deep);">&#x2014;</div>
       </div>
       </div>
@@ -510,17 +510,18 @@ function renderAll(data){
   const present = data.filter(r=>r.presence==='oui').length;
   const adults  = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_adultes||1),0);
   const kids    = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_enfants||0),0);
+    const guests  = adults + kids;
 
-  animCount('statTotal',   total);
-  animCount('statPresent', present);
-  animCount('statAdults',  adults);
-  animCount('statKids',    kids);
+    animCount('statTotal',      total);
+    animCount('statPresent',    present);
+    animCount('statAdults',     adults);
+    animCount('statKids',       kids);
+    document.getElementById('statTotalGuests').textContent = guests;
 
-  // Messages
-  const msgs = data.filter(r=>r.message && r.message.trim());
-  const msgSection = document.getElementById('messagesSection');
-  if(msgs.length > 0){
-    msgSection.style.display = 'block';
+    const msgs = data.filter(r=>r.message && r.message.trim());
+    const msgSection = document.getElementById('messagesSection');
+    if(msgs.length > 0){
+      msgSection.style.display = 'block';
     document.getElementById('messagesList').innerHTML = msgs.map(r=>`
       <div style="background:white;border:1.5px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;">
         <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rose-pale),var(--gold-lt));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--rose-deep);font-size:.8rem;flex-shrink:0;">${r.prenom[0]}${r.nom[0]}</div>
@@ -553,11 +554,17 @@ function renderTable(data){
   tbody.innerHTML = data.map(r => {
     const initials = (r.prenom[0]||'?') + (r.nom[0]||'?');
     const dateStr  = r.created_at
-      ? new Date(r.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
+      ? new Date(r.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
       : '—';
-    const groupBadge = r.accompagne==='oui'
+    const present = r.presence === 'oui';
+    const statusBadge = present
+      ? '<span class="badge present">✓ Présent·e</span>'
+      : '<span class="badge" style="background:var(--red-pale);color:var(--red);">✗ Absent·e</span>';
+    const groupBadge = present && r.accompagne==='oui'
       ? '<span class="badge groupe">👨‍👩‍👧‍👦 Groupe</span>'
-      : '<span class="badge seul">🙋 Seul·e</span>';
+      : present
+        ? '<span class="badge seul">🙋 Seul·e</span>'
+        : '<span class="badge" style="background:var(--border);color:var(--muted);">—</span>';
     const msgCell = r.message
       ? `<span title="${r.message}">${r.message.length>35 ? r.message.slice(0,35)+'…' : r.message}</span>`
       : '<span style="color:var(--border)">—</span>';
@@ -566,7 +573,7 @@ function renderTable(data){
       <td>
         <span class="name-cell">${r.prenom} ${r.nom.toUpperCase()}</span>
       </td>
-      <td><span class="badge present">✓ Confirmé</span></td>
+      <td>${statusBadge}</td>
       <td>${groupBadge}</td>
       <td style="font-weight:600;color:var(--gold);">${r.nb_adultes || 1}</td>
       <td style="font-weight:600;color:var(--rose-deep);">${r.nb_enfants || 0}</td>
