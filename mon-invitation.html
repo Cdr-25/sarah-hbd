@@ -459,11 +459,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   currentToken = params.get('token');
   if(!currentToken){ showScreen('screenError'); return; }
+  console.log('mon-invitation token', currentToken);
 
   // Charger les données
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${currentToken}&select=*`,
+      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${encodeURIComponent(currentToken)}&select=*`,
       { headers:{ 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY } }
     );
     const data = await res.json();
@@ -514,6 +515,7 @@ function onPresenceChange(){
   document.getElementById('m-row-accomp').classList.toggle('show', present);
   if(!present){
     document.getElementById('m-row-groupe').classList.remove('show');
+    document.getElementById('m-seul').checked = true;
   }
 }
 function onAccompChange(){
@@ -529,7 +531,7 @@ async function saveModif(){
   btn.disabled = true;
   btn.innerHTML = '&#x23F3;&nbsp; Enregistrement&hellip;';
 
-  const presence   = document.querySelector('input[name=presence]:checked')?.value || 'oui';
+  const presence   = document.querySelector('input[name=presence]:checked')?.value || 'non';
   const accompagne = document.querySelector('input[name=accompagne]:checked')?.value || 'seul';
   const nbAdultes  = accompagne === 'oui' ? parseInt(document.getElementById('m-adultes').value || '1') : 1;
   const nbEnfants  = accompagne === 'oui' ? parseInt(document.getElementById('m-enfants').value  || '0') : 0;
@@ -538,7 +540,7 @@ async function saveModif(){
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${currentToken}`,
+      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${encodeURIComponent(currentToken)}`,
       {
         method: 'PATCH',
         headers:{
@@ -581,7 +583,7 @@ async function doCancel(){
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${currentToken}`,
+      `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${encodeURIComponent(currentToken)}`,
       {
         method: 'PATCH',
         headers:{
@@ -590,7 +592,7 @@ async function doCancel(){
           'Authorization': 'Bearer ' + SUPABASE_KEY,
           'Prefer':        'return=minimal'
         },
-        body: JSON.stringify({ presence: 'annule' })
+        body: JSON.stringify({ presence: 'non' })
       }
     );
     if(!res.ok){ throw new Error(await res.text()); }
