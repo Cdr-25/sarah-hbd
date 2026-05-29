@@ -247,12 +247,12 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,white,var(-
     <div class="hero-tagline">&#x1F380; Anniversaire &amp; Bapt&#234;me &#x1F338;</div>
   </div>
 
-  <div class="scroll-cta">
+  <a class="scroll-cta" href="#rsvp">
     <span>Voir l&#39;invitation</span>
     <div class="scroll-arrow">
       <svg viewBox="0 0 14 14" fill="none" stroke="var(--rose)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M3 5l4 4 4-4"/></svg>
     </div>
-  </div>
+  </a>
 </section>
 
 <!-- INFOS -->
@@ -436,6 +436,12 @@ new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIn
 /* Helpers */
 function showEl(id){var e=document.getElementById(id);if(e)e.classList.add('show');}
 function hideEl(id){var e=document.getElementById(id);if(e)e.classList.remove('show');}
+function createToken(){
+  if(window.crypto && crypto.randomUUID){
+    return crypto.randomUUID();
+  }
+  return 't_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
+}
 function collapse(el){if(!el)return;el.style.transition='opacity .35s,transform .35s,max-width .4s,margin .35s,padding .35s,flex .35s';el.style.opacity='0';el.style.transform='scale(.82)';el.style.maxWidth='0';el.style.overflow='hidden';el.style.margin='0';el.style.padding='0';el.style.flex='0 0 0';el.style.pointerEvents='none';}
 function expand(el){if(!el)return;el.style.opacity='1';el.style.transform='';el.style.maxWidth='';el.style.overflow='';el.style.margin='';el.style.padding='';el.style.flex='';el.style.pointerEvents='';}
 
@@ -544,21 +550,23 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
   document.getElementById('formError').classList.remove('show');
   if(!validate()){document.getElementById('formError').classList.add('show');window.scrollTo({top:document.getElementById('rsvp').offsetTop-20,behavior:'smooth'});return;}
   var btn=this.querySelector('.btn-rsvp');btn.disabled=true;btn.textContent='Envoi en cours...';
+  var presence=(document.querySelector('input[name=presence]:checked')||{}).value||'oui';
   var ac=(document.querySelector('input[name=accompagne]:checked')||{}).value||'seul';
   var nbA=ac==='oui'?parseInt(document.getElementById('nb-adultes').value||1):1;
   var nbE=ac==='oui'?parseInt(document.getElementById('nb-enfants').value||0):0;
-  var data={prenom:document.getElementById('prenom').value.trim(),nom:document.getElementById('nom').value.trim(),presence:'oui',accompagne:ac,nb_adultes:nbA,nb_enfants:nbE,message:document.getElementById('message').value.trim()};
+  var token = createToken();
+  var data={prenom:document.getElementById('prenom').value.trim(),nom:document.getElementById('nom').value.trim(),presence:presence,accompagne:ac,nb_adultes:nbA,nb_enfants:nbE,message:document.getElementById('message').value.trim(),token:token};
   try{
     var res=await fetch(SUPABASE_URL+'/rest/v1/rsvp',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=representation'},body:JSON.stringify(data)});
     if(!res.ok){throw new Error(await res.text());}
     var result=await res.json();
-    var token=(result[0]&&result[0].token)?result[0].token:'';
-    var modifLink='https://sarah-hdb-silk.vercel.app/mon-invitation?token='+token;
-    var waMsg=encodeURIComponent(modifLink);
+    var returnedToken=(result[0]&&result[0].token)?result[0].token:token;
+    var modifLink=window.location.origin + '/mon-invitation?token=' + encodeURIComponent(returnedToken);
+    var waMsg='Voici mon lien pour modifier ma presence a la fete de Sarah%0AValable jusqu%27au 17 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
     document.getElementById('rsvpForm').style.display='none';
     var sm=document.getElementById('successMsg');sm.style.display='block';
     document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, votre pr&#233;sence est confirm&#233;e ! &#x1F389;<br>On vous attend pour f&#234;ter la petite princesse Sarah &#x1F451;';
-    if(token){document.getElementById('waBtn').href='https://wa.me/?text='+waMsg;document.getElementById('waWrap').style.display='block';}
+    if(returnedToken){document.getElementById('waBtn').href='https://wa.me/?text='+waMsg;document.getElementById('waWrap').style.display='block';}
     launchBurst();
   }catch(err){
     console.error(err);btn.disabled=false;btn.textContent='Confirmer ma presence';
