@@ -757,27 +757,8 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
       + '</span>';
       if(returnedToken){document.getElementById('waBtn').href='https://wa.me/?text='+waMsg;document.getElementById('waWrap').style.display='block';}
     } else {
-      // Masquer toutes les sections sauf RSVP (qui contient le message)
-      var hero = document.querySelector('.hero');
-      var secInfos = document.querySelector('.section-infos');
-      var secGps   = document.querySelector('.section-gps');
-      if(hero)     hero.style.display     = 'none';
-      if(secInfos) secInfos.style.display = 'none';
-      if(secGps)   secGps.style.display   = 'none';
-      // Centrer la section RSVP pour qu'elle occupe tout l'écran
-      var secRsvp = document.querySelector('.section-rsvp');
-      if(secRsvp){
-        secRsvp.style.minHeight        = '100vh';
-        secRsvp.style.display          = 'flex';
-        secRsvp.style.alignItems       = 'center';
-        secRsvp.style.justifyContent   = 'center';
-        secRsvp.style.background       = '#f3fbf6';
-      }
-      document.getElementById('successText').innerHTML =
-        '<strong>'+data.prenom+'</strong>, nous avons bien noté votre absence. 😔<br><br>'
-        + 'Pas de souci, l'essentiel c'est que vous pensiez à elle. 🌿<br>'
-        + 'Sarah vous envoie tout son amour&nbsp;! 💚';
-      document.getElementById('waWrap').style.display = 'none';
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, nous avons bien enregistré votre réponse. 😔<br>Pas de souci, l\'essentiel c\'est que vous pensiez à elle.<br>Sarah vous envoie tout son amour&nbsp;! 💚';
+      document.getElementById('waWrap').style.display='none';
     }
     launchBurst();
   }catch(err){
@@ -822,6 +803,7 @@ function checkMapVisibility(){
     if(countdown) countdown.style.display = 'block';
   }
 }
+checkMapVisibility();
 
 function launchBurst(){
   var c=document.getElementById('burst');c.style.display='block';
@@ -841,6 +823,5 @@ function launchBurst(){
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script>checkMapVisibility();</script>
 </body>
 </html>
