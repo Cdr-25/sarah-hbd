@@ -258,7 +258,7 @@ body {
 <body>
 
 <!-- Loading -->
-<div class="screen" id="screenLoading" style="display:none!important;visibility:hidden!important;">
+<div class="screen active" id="screenLoading">
   <div class="loading-dots"><span></span><span></span><span></span></div>
   <p style="color:var(--muted);">Chargement de votre invitation…</p>
 </div>
@@ -448,14 +448,14 @@ function toast(msg, type=''){
 
 /* ── SHOW SCREEN ── */
 function showScreen(id){
-  ['screenLoading','screenError','screenUsed','screenClosed','screenCancelled'].forEach(s=>{\
+  ['screenLoading','screenError','screenUsed','screenClosed','screenCancelled'].forEach(s=>{
     document.getElementById(s).classList.remove('active');
   });
   document.getElementById('mainCard').classList.remove('active');
   const el = document.getElementById(id);
   if(el) el.classList.add('active');
 }
-function showCard(){ document.getElementById('screenLoading').style.display='none'; document.getElementById('mainCard').classList.add('active'); }
+function showCard(){ document.getElementById('screenLoading').classList.remove('active'); document.getElementById('mainCard').classList.add('active'); }
 
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -573,12 +573,22 @@ async function saveModif(){
     document.getElementById('ciAdultes').textContent = nbAdultes;
     document.getElementById('ciEnfants').textContent = nbEnfants;
 
-    document.getElementById('modifForm').style.display   = 'none';
-    document.querySelector('.card-header').style.display  = 'none';
-    document.querySelector('.current-info').style.display = 'none';
-    document.querySelector('.deadline-notice').style.display = 'none';
-    document.getElementById('successModif').style.display = 'block';
-    toast('Modifications enregistrées !', 'ok');
+    document.getElementById('modifForm').style.display        = 'none';
+    document.querySelector('.card-header').style.display       = 'none';
+    document.querySelector('.current-info').style.display      = 'none';
+    document.querySelector('.deadline-notice').style.display   = 'none';
+
+    // Message adapté selon présence oui/non
+    var succEl = document.getElementById('successModif');
+    if(presence === 'non'){
+      succEl.querySelector('h3').textContent = 'Absence enregistrée';
+      succEl.querySelector('p').innerHTML    = 'Nous avons bien noté votre absence. 💔<br>Nous espérons vous revoir très bientôt. Merci pour votre réponse.';
+    } else {
+      succEl.querySelector('h3').textContent = 'Modifications enregistrées !';
+      succEl.querySelector('p').innerHTML    = 'Vos informations ont bien été mises à jour.<br>On a hâte de vous accueillir pour fêter la petite Sarah 👑';
+    }
+    succEl.style.display = 'block';
+    toast(presence === 'non' ? 'Absence enregistrée' : 'Modifications enregistrées !', 'ok');
 
   } catch(e){
     console.error(e);
