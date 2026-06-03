@@ -694,17 +694,30 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
     var result=await res.json();
     var returnedToken=(result[0]&&result[0].token)?result[0].token:token;
     var modifLink=window.location.origin + '/mon-invitation?token=' + encodeURIComponent(returnedToken);
-    var waMsg='Voici mon lien pour modifier ma presence a la fete de Sarah%0AValable jusqu%27au 17 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
+    var waMsg='✨ Mon Invitation — Fête de Sarah 👑%0AModifiable une seule fois · Valable jusqu\'au 17 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
     document.getElementById('rsvpForm').style.display='none';
     var sh=document.querySelector('.s-header');if(sh)sh.style.display='none';
     var sm=document.getElementById('successMsg');sm.style.display='block';
-    document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, votre présence est confirmée ! 🎉<br>On vous attend pour fêter la petite princesse Sarah 👑<br><br>'
-    + '<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'
-    + '📍 <strong>L\'itinéraire GPS</strong> pour nous rejoindre sera disponible directement sur cette page '
-    + 'le <strong>18 juillet à partir de 8h00</strong>.<br>'
-    + 'Pensez à revenir ce jour-là pour accéder au chemin. À très bientôt&nbsp;! 💝'
-    + '</span>';
-    if(returnedToken){document.getElementById('waBtn').href='https://wa.me/?text='+waMsg;document.getElementById('waWrap').style.display='block';}
+    // Masquer hero — ne garder que le message succès + footer
+    document.querySelector('.hero').style.display='none';
+    document.querySelector('.section-rsvp').style.background='#f3fbf6';
+    document.querySelector('.section-rsvp').style.minHeight='calc(100vh - 120px)';
+    document.querySelector('.section-rsvp').style.display='flex';
+    document.querySelector('.section-rsvp').style.alignItems='center';
+    document.querySelector('.section-rsvp').style.justifyContent='center';
+    // Texte selon présence ou absence
+    if(presence==='oui'){
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, votre présence est confirmée ! 🎉<br>On vous attend pour fêter la petite princesse Sarah 👑<br><br>'
+      + '<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'
+      + '📍 <strong>L\'itinéraire GPS</strong> pour nous rejoindre sera disponible directement sur cette page '
+      + 'le <strong>18 juillet à partir de 8h00</strong>.<br>'
+      + 'Pensez à revenir ce jour-là pour accéder au chemin. À très bientôt&nbsp;! 💝'
+      + '</span>';
+      if(returnedToken){document.getElementById('waBtn').href='https://wa.me/?text='+waMsg;document.getElementById('waWrap').style.display='block';}
+    } else {
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, nous avons bien enregistré votre réponse. 😔<br>Pas de souci, l\'essentiel c\'est que vous pensiez à elle.<br>Sarah vous envoie tout son amour&nbsp;! 💚';
+      document.getElementById('waWrap').style.display='none';
+    }
     launchBurst();
   }catch(err){
     console.error(err);btn.disabled=false;btn.textContent='Confirmer ma presence';

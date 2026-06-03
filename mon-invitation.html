@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mon Invitation · Njamen Atcheute Sarah · 1 an</title>
+<title>Mon Invitation · Sarah · 1 an</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --rose:      #e8809e;
-  --rose-deep: #c95e7e;
-  --rose-pale: #fce8ef;
-  --rose-bg:   #fff5f8;
-  --gold:      #c9a85c;
-  --gold-lt:   #f2ddb5;
-  --cream:     #fdf6f0;
+  --rose:      #4a9e6b;
+  --rose-deep: #2d6e47;
+  --rose-pale: #eaf6ef;
+  --rose-bg:   #f3fbf6;
+  --gold:      #b8956a;
+  --gold-lt:   #e8d5b0;
+  --cream:     #f3fbf6;
   --white:     #ffffff;
-  --ink:       #2c1f26;
-  --muted:     #a08890;
-  --green:     #4caf7d;
+  --ink:       #2d3a30;
+  --muted:     #7a8e80;
+  --green:     #4a9e6b;
   --red:       #e57373;
   --red-pale:  #fdecea;
-  --border:    rgba(232,128,158,.22);
+  --border:    rgba(74,158,107,.22);
 }
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
@@ -267,8 +267,17 @@ body {
 <div class="screen" id="screenError">
   <div class="screen-emoji">🔗</div>
   <h2>Lien invalide</h2>
-  <p>Ce lien de modification est introuvable ou a déjà été utilisé.<br>
+  <p>Ce lien de modification est introuvable.<br>
      Vérifiez le lien reçu sur WhatsApp ou contactez l'organisatrice.</p>
+</div>
+
+<!-- Lien déjà utilisé -->
+<div class="screen" id="screenUsed">
+  <div class="screen-emoji">🔒</div>
+  <h2>Lien déjà utilisé</h2>
+  <p>Vous avez déjà effectué votre modification.<br>
+     Ce lien n'est valable qu'<strong>une seule fois</strong>.<br><br>
+     Pour toute question, contactez directement l'organisatrice.</p>
 </div>
 
 <!-- Modifications closes -->
@@ -295,7 +304,7 @@ body {
   <div class="card-header">
     <div class="card-badge">👑 Mon Invitation</div>
     <h1 id="guestName">Bonjour !</h1>
-    <p>Voici votre invitation pour la fête de <strong>Njamen Atcheute Sarah</strong></p>
+    <p>Voici votre invitation pour la fête de <strong>Sarah</strong></p>
   </div>
 
   <!-- Date limite -->
@@ -417,7 +426,7 @@ body {
 </div>
 
 <!-- Footer -->
-<div class="page-footer">🌸 Njamen Atcheute Sarah · 1 an · 18 Juillet 2026 · Yassa, Douala 🌸</div>
+<div class="page-footer">🌸 Sarah · 1 an · 18 Juillet 2026 · Yassa, Douala 🌸<br><span style="font-size:.75rem;opacity:.7;">Créé avec ❤️ par <a href="https://kinerty.com" target="_blank" style="color:var(--rose-deep);text-decoration:none;">Kinerty.com</a></span></div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
@@ -439,7 +448,7 @@ function toast(msg, type=''){
 
 /* ── SHOW SCREEN ── */
 function showScreen(id){
-  ['screenLoading','screenError','screenClosed','screenCancelled'].forEach(s=>{
+  ['screenLoading','screenError','screenUsed','screenClosed','screenCancelled'].forEach(s=>{\
     document.getElementById(s).classList.remove('active');
   });
   document.getElementById('mainCard').classList.remove('active');
@@ -471,6 +480,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     if(!data || data.length === 0){ showScreen('screenError'); return; }
 
     currentData = data[0];
+
+    // Vérifier si le lien a déjà été utilisé
+    if(currentData.modifie === true){ showScreen('screenUsed'); return; }
+
     populateForm(currentData);
     showCard();
   } catch(e){
@@ -536,7 +549,7 @@ async function saveModif(){
   const nbAdultes  = accompagne === 'oui' ? parseInt(document.getElementById('m-adultes').value || '1') : 1;
   const nbEnfants  = accompagne === 'oui' ? parseInt(document.getElementById('m-enfants').value  || '0') : 0;
 
-  const updates = { presence, accompagne, nb_adultes: nbAdultes, nb_enfants: nbEnfants };
+  const updates = { presence, accompagne, nb_adultes: nbAdultes, nb_enfants: nbEnfants, modifie: true };
 
   try {
     const res = await fetch(
@@ -561,6 +574,9 @@ async function saveModif(){
     document.getElementById('ciEnfants').textContent = nbEnfants;
 
     document.getElementById('modifForm').style.display   = 'none';
+    document.querySelector('.card-header').style.display  = 'none';
+    document.querySelector('.current-info').style.display = 'none';
+    document.querySelector('.deadline-notice').style.display = 'none';
     document.getElementById('successModif').style.display = 'block';
     toast('Modifications enregistrées !', 'ok');
 
@@ -592,7 +608,7 @@ async function doCancel(){
           'Authorization': 'Bearer ' + SUPABASE_KEY,
           'Prefer':        'return=minimal'
         },
-        body: JSON.stringify({ presence: 'non' })
+        body: JSON.stringify({ presence: 'non', modifie: true })
       }
     );
     if(!res.ok){ throw new Error(await res.text()); }
