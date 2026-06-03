@@ -539,9 +539,9 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#f4fbf6,#ee
   <div id="map-section" style="display:none;">
     <div id="map"></div>
     <div class="map-directions-wrap">
-      <a id="map-directions-btn" href="#" target="_blank" class="map-directions-btn">
+      <button id="map-directions-btn" type="button" class="map-directions-btn">
         🧭 &nbsp;Ouvrir dans Google Maps
-      </a>
+      </button>
     </div>
   </div>
 </section>
@@ -783,8 +783,7 @@ function initMap(){
   var gmUrl = 'https://www.google.com/maps/dir/?api=1&destination='+MAP_LAT+','+MAP_LNG;
   var btn = document.getElementById('map-directions-btn');
   if(btn){
-    btn.href = gmUrl;
-    btn.onclick = function(e){ e.preventDefault(); window.open(gmUrl,'_blank'); };
+    btn.onclick = function(){ window.open(gmUrl,'_blank'); };
   }
 }
 
