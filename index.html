@@ -303,7 +303,6 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#f4fbf6,#ee
 .hero{padding-bottom:0 !important}
 .hero-wave{position:relative;z-index:5;margin-top:-2px;line-height:0}
 .hero-wave svg{display:block;width:100%}
-
 /* ── Section GPS ── */
 .section-gps{position:relative;z-index:2;padding:40px 24px 48px;background:#f3fbf6;}
 .section-gps .s-header{text-align:center;margin-bottom:28px;}
@@ -318,8 +317,10 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#f4fbf6,#ee
 .map-directions-wrap{text-align:center;margin-top:18px;}
 .map-directions-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#2d6e47,#4a9e6b);color:white;text-decoration:none;padding:13px 28px;border-radius:14px;font-family:'Jost',sans-serif;font-size:.88rem;font-weight:600;letter-spacing:.1em;box-shadow:0 6px 20px rgba(45,110,71,.3);transition:all .3s;}
 .map-directions-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(45,110,71,.4);}
+
+/* Instructions de guidage */
+.map-embed-wrap{border-radius:18px;overflow:hidden;box-shadow:0 6px 24px rgba(45,110,71,.15);margin-bottom:16px}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 </head>
 <body>
 
@@ -435,12 +436,6 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#f4fbf6,#ee
         <button type="button" class="btn-reset" id="reset-presence" style="display:none">&#x21A9; Modifier mon choix</button>
       </div>
 
-      <!-- Message absent (juste message + reset) -->
-      <div class="absent-msg" id="row-absent-msg">
-        <span class="absent-emoji">&#x1F917;</span>
-        <p>Pas de souci, l&#39;essentiel c&#39;est que vous pensiez &#224; elle.<br>Sarah vous envoie tout son amour quand m&#234;me !</p>
-      </div>
-
       <!-- Identite -->
       <div class="grid2 cond" id="row-identite">
         <div class="field">
@@ -513,7 +508,7 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#f4fbf6,#ee
           <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           &#x1F4F2; Sauvegarder mon lien de modification
         </a>
-        <p class="wa-note">Modifiable jusqu&#39;au <strong>17 juillet 2026</strong></p>
+        <p class="wa-note">Modifiable jusqu&#39;au <strong>18 juillet 2026</strong></p>
       </div>
     </div>
   </div>
@@ -523,7 +518,7 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#f4fbf6,#ee
 <section class="section-gps">
   <div class="s-header">
     <h2>📍 Nous rejoindre</h2>
-    <p>L'itinéraire pour le repas festif à Yassa, Douala</p>
+    <p>Repas festif · Yassa, Douala</p>
   </div>
 
   <!-- Compte à rebours (affiché avant le 18 juillet) -->
@@ -535,17 +530,37 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#f4fbf6,#ee
        Pensez à revenir ce jour-là pour accéder au chemin. 💚</p>
   </div>
 
-  <!-- Carte Leaflet (affichée le 18 juillet) -->
-  <div id="map-section" style="display:none;">
-    <div id="map"></div>
+  <!-- Carte + instructions (affichées le 18 juillet) -->
+  <div id="map-section" style="display:none;max-width:580px;margin:0 auto;width:100%">
+
+    <!-- Google Maps embed pointant exactement fin du parking -->
+    <div class="map-embed-wrap">
+      <iframe
+        id="map-iframe"
+        data-src="pending"
+        width="100%" height="280"
+        style="border:0;border-radius:18px;display:block"
+        allowfullscreen loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+
+    <!-- Bouton GPS natif -->
     <div class="map-directions-wrap">
       <button id="map-directions-btn" type="button" class="map-directions-btn">
-        🧭 &nbsp;Ouvrir dans Google Maps
+        🧭 &nbsp;Lancer la navigation GPS
       </button>
     </div>
+
   </div>
 </section>
 
+
+<!-- Message absent (affiché seul quand présence = non) -->
+<div class="absent-msg" id="row-absent-msg" style="display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;min-height:60vh;background:#f8fdf9">
+  <span class="absent-emoji" style="font-size:3rem;margin-bottom:20px">&#x1F917;</span>
+  <p style="font-size:1rem;color:#3a4e40;line-height:1.8;max-width:360px">Pas de souci, l&#39;essentiel c&#39;est que vous pensiez &#224; elle.<br>Sarah vous envoie tout son amour quand m&#234;me&nbsp;!</p>
+</div>
 
 <footer>
   <div class="ft-flowers">&#x1F338; &#x1F380; &#x1F338;</div>
@@ -570,8 +585,8 @@ var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
    TEST_MAP = false → carte visible le 18 juillet 2026 à 8h00 seulement
    ══════════════════════════════════════════════════ */
 var TEST_MAP  = true;            // ← changer ici pour les tests
-var MAP_LAT   = 3.999819;        // GPS Repas festif
-var MAP_LNG   = 9.836840;        // GPS Repas festif
+var MAP_LAT   = 4.007988;        // Domicile exact
+var MAP_LNG   = 9.834614;        // Domicile exact
 var MAP_LABEL = 'Domicile – Yassa, Douala (derrière le stade de Japoma)';
 var MAP_DATE  = new Date('2026-07-18T08:00:00');   // Date/heure d'ouverture
 
@@ -639,16 +654,25 @@ function onPresence(){
     showEl('row-identite');showEl('row-accomp-q');showEl('row-msg');showEl('btn-rsvp-wrap');
     hideEl('row-absent-msg');
   } else if(absent){
-    document.getElementById('badge-presence-emoji').textContent='😔';
-    document.getElementById('badge-presence-text').textContent='Je ne serai pas là';
-    badge.classList.add('show');
-    resetPresence.style.display='inline-flex';
-    hideEl('row-identite');hideEl('row-accomp-q');hideEl('row-groupe');hideEl('row-msg');hideEl('btn-rsvp-wrap');
-    showEl('row-absent-msg');
-    document.querySelectorAll('input[name=accompagne]').forEach(function(r){r.checked=false;});
-    var ag=document.getElementById('accomp-group'); if(ag) ag.style.display='';
-    document.getElementById('reset-accomp').style.display='none';
-    document.getElementById('badge-accomp').classList.remove('show');
+    // Masquer TOUTE la page sauf le message absent + Kinerty dans le footer
+    var toHideSelectors = [
+      '.hero', '.hero-wave', '.section-infos', '.section-gps',
+      '.s-header', '#rsvpForm', '.rsvp-wrap', '#formError',
+      '#badge-presence', '#presence-group', '#reset-presence',
+      '#err-presence'
+    ];
+    toHideSelectors.forEach(function(sel){
+      var els = document.querySelectorAll(sel);
+      els.forEach(function(el){ el.style.display = 'none'; });
+    });
+    // Masquer section-rsvp entière sauf row-absent-msg
+    var sRsvp = document.querySelector('.section-rsvp');
+    if(sRsvp){ sRsvp.style.cssText = 'min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;background:#f8fdf9'; }
+    // Afficher le message absent
+    var absentBox = document.getElementById('row-absent-msg');
+    if(absentBox){ absentBox.style.display = 'flex'; }
+    // Dans le footer : masquer tout sauf Kinerty
+    document.querySelectorAll('.ft-flowers,.ft-quote,.ft-date').forEach(function(el){ el.style.display='none'; });
   }
 }
 oui.addEventListener('change',onPresence);
@@ -736,7 +760,7 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
     var result=await res.json();
     var returnedToken=(result[0]&&result[0].token)?result[0].token:token;
     var modifLink=window.location.origin + '/mon-invitation?token=' + encodeURIComponent(returnedToken);
-    var waMsg='✨ Mon Invitation — Fête de Sarah 👑%0AModifiable une seule fois · Valable jusqu\'au 17 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
+    var waMsg='✨ Mon Invitation — Fête de Sarah 👑%0AModifiable une seule fois · Valable jusqu\'au 18 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
     document.getElementById('rsvpForm').style.display='none';
     var sh=document.querySelector('.s-header');if(sh)sh.style.display='none';
     var sm=document.getElementById('successMsg');sm.style.display='block';
@@ -757,7 +781,15 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
       + '</span>';
       if(returnedToken){document.getElementById('waBtn').href='https://wa.me/?text='+waMsg;document.getElementById('waWrap').style.display='block';}
     } else {
-      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, nous avons bien enregistré votre réponse. 😔<br>Pas de souci, l\'essentiel c\'est que vous pensiez à elle.<br>Sarah vous envoie tout son amour&nbsp;! 💚';
+      var hEl=document.querySelector('.hero');
+      var iEl=document.querySelector('.section-infos');
+      var gEl=document.querySelector('.section-gps');
+      if(hEl)hEl.style.display='none';
+      if(iEl)iEl.style.display='none';
+      if(gEl)gEl.style.display='none';
+      var rEl=document.querySelector('.section-rsvp');
+      if(rEl){rEl.style.minHeight='100vh';rEl.style.display='flex';rEl.style.alignItems='center';rEl.style.justifyContent='center';rEl.style.background='#f3fbf6';}
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, nous avons bien noté votre absence. Sarah vous envoie tout son amour ! 💚';
       document.getElementById('waWrap').style.display='none';
     }
     launchBurst();
@@ -769,22 +801,38 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
 });
 
 /* Confettis */
+
+function launchBurst(){
+  var c=document.getElementById('burst');c.style.display='block';
+  var cols=['#f4a7b9','#d4af7a','#e07fa0','#fce4ec','#f0d9b0','#fff'];
+  for(var i=0;i<100;i++){var el=document.createElement('div');el.className='cf';var sz=Math.random()*10+4;el.style.cssText='left:'+Math.random()*100+'%;width:'+sz+'px;height:'+sz+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';border-radius:'+(Math.random()>.5?'50%':'3px')+';animation-duration:'+(Math.random()*2.5+2)+'s;animation-delay:'+(Math.random()*1.5)+'s;';c.appendChild(el);}
+  setTimeout(function(){c.style.display='none';c.innerHTML='';},6000);
+}
+
+// Reveal paragraphes au scroll
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
+  },{threshold:.15});
+  els.forEach(function(el){ io.observe(el); });
+})();
+
+
+
+</script>
+<script>
 /* ── Logique GPS ── */
 function initMap(){
-  var mapEl = document.getElementById('map');
-  if(!mapEl || mapEl._leaflet_id) return;
-  var map = L.map('map', {zoomControl:true, scrollWheelZoom:false}).setView([MAP_LAT, MAP_LNG], 15);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© OpenStreetMap contributors', maxZoom:19
-  }).addTo(map);
-  var icon = L.divIcon({html:'<div style="font-size:2rem">🏠</div>', iconSize:[40,40], iconAnchor:[20,20], className:''});
-  L.marker([MAP_LAT, MAP_LNG], {icon:icon}).addTo(map).bindPopup('<strong>'+MAP_LABEL+'</strong>').openPopup();
-  setTimeout(function(){ map.invalidateSize(); }, 300);
-  var gmUrl = 'https://www.google.com/maps/dir/?api=1&destination='+MAP_LAT+','+MAP_LNG;
-  var btn = document.getElementById('map-directions-btn');
-  if(btn){
-    btn.onclick = function(){ window.open(gmUrl,'_blank'); };
+  var iframe = document.getElementById('map-iframe');
+  if(iframe && iframe.getAttribute('data-src') === 'pending'){
+    iframe.src = 'https://maps.google.com/maps?q='+MAP_LAT+','+MAP_LNG+'&z=17&output=embed&hl=fr';
+    iframe.setAttribute('data-src','loaded');
   }
+  // Bouton GPS natif (ouvre Maps avec navigation turn-by-turn)
+  var gmUrl = 'https://www.google.com/maps/dir/?api=1&destination='+MAP_LAT+','+MAP_LNG+'&travelmode=driving';
+  var btn = document.getElementById('map-directions-btn');
+  if(btn){ btn.onclick = function(){ window.open(gmUrl,'_blank'); }; }
 }
 
 function checkMapVisibility(){
@@ -803,25 +851,8 @@ function checkMapVisibility(){
     if(countdown) countdown.style.display = 'block';
   }
 }
+
 checkMapVisibility();
-
-function launchBurst(){
-  var c=document.getElementById('burst');c.style.display='block';
-  var cols=['#f4a7b9','#d4af7a','#e07fa0','#fce4ec','#f0d9b0','#fff'];
-  for(var i=0;i<100;i++){var el=document.createElement('div');el.className='cf';var sz=Math.random()*10+4;el.style.cssText='left:'+Math.random()*100+'%;width:'+sz+'px;height:'+sz+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';border-radius:'+(Math.random()>.5?'50%':'3px')+';animation-duration:'+(Math.random()*2.5+2)+'s;animation-delay:'+(Math.random()*1.5)+'s;';c.appendChild(el);}
-  setTimeout(function(){c.style.display='none';c.innerHTML='';},6000);
-}
-
-// Reveal paragraphes au scroll
-(function(){
-  var els = document.querySelectorAll('.reveal');
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('visible'); });
-  },{threshold:.15});
-  els.forEach(function(el){ io.observe(el); });
-})();
-
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </body>
 </html>
