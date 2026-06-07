@@ -7,20 +7,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --rose:      #4a9e6b;
-  --rose-deep: #2d6e47;
-  --rose-pale: #eaf6ef;
-  --rose-bg:   #f3fbf6;
-  --gold:      #b8956a;
-  --gold-lt:   #e8d5b0;
-  --cream:     #f3fbf6;
+  --rose:      #e8809e;
+  --rose-deep: #c9527a;
+  --rose-pale: #fce8ef;
+  --rose-bg:   #fff8fb;
+  --gold:      #c9a85c;
+  --gold-lt:   #f2ddb5;
+  --cream:     #fff8fb;
   --white:     #ffffff;
-  --ink:       #2d3a30;
-  --muted:     #7a8e80;
-  --green:     #4a9e6b;
+  --ink:       #2c1a22;
+  --muted:     #a08090;
+  --green:     #4caf7d;
   --red:       #e57373;
   --red-pale:  #fdecea;
-  --border:    rgba(74,158,107,.22);
+  --border:    rgba(232,128,158,.22);
 }
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
@@ -244,7 +244,7 @@ body {
   white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.2);
 }
 .toast.show { transform:translateX(-50%) translateY(0); }
-.toast.ok  { background:var(--green); }
+.toast.ok  { background:var(--rose-deep); }
 .toast.err { background:var(--red); }
 
 /* Footer */
@@ -259,12 +259,14 @@ body {
 
 <!-- Loading -->
 <div class="screen active" id="screenLoading">
+  <div style="font-size:2.5rem;margin-bottom:16px;animation:crown-float 2s ease-in-out infinite">👑</div>
   <div class="loading-dots"><span></span><span></span><span></span></div>
-  <p style="color:var(--muted);">Chargement de votre invitation…</p>
+  <p style="color:var(--rose-deep);font-weight:500;margin-top:12px">Chargement de votre invitation…</p>
+  <p style="color:var(--muted);font-size:.78rem;margin-top:6px">Merci de patienter quelques secondes 💝</p>
 </div>
 
 <!-- Erreur token invalide -->
-<div class="screen" id="screenError">
+<div class="screen" id="screenError" style="display:none">
   <div class="screen-emoji">🔗</div>
   <h2>Lien invalide</h2>
   <p>Ce lien de modification est introuvable.<br>
@@ -449,11 +451,12 @@ function toast(msg, type=''){
 /* ── SHOW SCREEN ── */
 function showScreen(id){
   ['screenLoading','screenError','screenUsed','screenClosed','screenCancelled'].forEach(s=>{
-    document.getElementById(s).classList.remove('active');
+    var el = document.getElementById(s);
+    if(el){ el.classList.remove('active'); el.style.display=''; }
   });
   document.getElementById('mainCard').classList.remove('active');
   const el = document.getElementById(id);
-  if(el) el.classList.add('active');
+  if(el){ el.style.display=''; el.classList.add('active'); }
 }
 function showCard(){ document.getElementById('screenLoading').classList.remove('active'); document.getElementById('mainCard').classList.add('active'); }
 
@@ -470,12 +473,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   if(!currentToken){ showScreen('screenError'); return; }
   console.log('mon-invitation token', currentToken);
 
-  // Charger les données
+  // Charger les données avec timeout 8s
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(()=>controller.abort(), 8000);
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/rsvp?token=eq.${currentToken}&select=*`,
-      { headers:{ 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY } }
+      { headers:{ 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY }, signal:controller.signal }
     );
+    clearTimeout(timer);
     const data = await res.json();
     if(!data || data.length === 0){ showScreen('screenError'); return; }
 
@@ -488,6 +494,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     showCard();
   } catch(e){
     console.error(e);
+    if(e.name === 'AbortError'){
+      // Timeout — proposer de réessayer
+      document.getElementById('screenError').querySelector('h2').textContent = 'Chargement lent…';
+      document.getElementById('screenError').querySelector('p').innerHTML = 'La connexion a pris trop de temps.<br><button onclick="location.reload()" style="margin-top:12px;padding:10px 20px;background:var(--rose);color:white;border:none;border-radius:10px;cursor:pointer;font-family:Jost,sans-serif">Réessayer</button>';
+    }
     showScreen('screenError');
   }
 });
@@ -573,22 +584,12 @@ async function saveModif(){
     document.getElementById('ciAdultes').textContent = nbAdultes;
     document.getElementById('ciEnfants').textContent = nbEnfants;
 
-    document.getElementById('modifForm').style.display        = 'none';
-    document.querySelector('.card-header').style.display       = 'none';
-    document.querySelector('.current-info').style.display      = 'none';
-    document.querySelector('.deadline-notice').style.display   = 'none';
-
-    // Message adapté selon présence oui/non
-    var succEl = document.getElementById('successModif');
-    if(presence === 'non'){
-      succEl.querySelector('h3').textContent = 'Absence enregistrée';
-      succEl.querySelector('p').innerHTML    = 'Nous avons bien noté votre absence. 💔<br>Nous espérons vous revoir très bientôt. Merci pour votre réponse.';
-    } else {
-      succEl.querySelector('h3').textContent = 'Modifications enregistrées !';
-      succEl.querySelector('p').innerHTML    = 'Vos informations ont bien été mises à jour.<br>On a hâte de vous accueillir pour fêter la petite Sarah 👑';
-    }
-    succEl.style.display = 'block';
-    toast(presence === 'non' ? 'Absence enregistrée' : 'Modifications enregistrées !', 'ok');
+    document.getElementById('modifForm').style.display   = 'none';
+    document.querySelector('.card-header').style.display  = 'none';
+    document.querySelector('.current-info').style.display = 'none';
+    document.querySelector('.deadline-notice').style.display = 'none';
+    document.getElementById('successModif').style.display = 'block';
+    toast('Modifications enregistrées !', 'ok');
 
   } catch(e){
     console.error(e);
