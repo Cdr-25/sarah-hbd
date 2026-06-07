@@ -544,7 +544,7 @@ function renderAll(data){
   const present = data.filter(r=>r.presence==='oui').length;
   const adults  = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_adultes||1),0);
   const kids    = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_enfants||0),0);
-    const guests  = adults + kids;
+    const guests  = present + adults + kids;
 
     animCount('statTotal',      total);
     animCount('statPresent',    present);
