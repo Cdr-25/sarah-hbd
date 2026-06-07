@@ -438,6 +438,13 @@ const SUPABASE_URL = 'https://xbthhseeqidsnmvnfaya.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhidGhoc2VlcWlkc25tdm5mYXlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODI5MzgsImV4cCI6MjA5NTM1ODkzOH0.tQrDeZHY5GwnoUq47T8JWalpJBC0bzfaCZzF3z5jU1I';
 const DEADLINE    = new Date('2026-07-17T23:59:59');
 
+/* Warm-up Supabase */
+setTimeout(function(){
+  fetch(SUPABASE_URL+'/rest/v1/rsvp?limit=1',{
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+  }).catch(function(){});
+}, 1000);
+
 let currentData = null;
 let currentToken = null;
 
@@ -553,7 +560,9 @@ async function saveModif(){
 
   const btn = document.getElementById('btnSave');
   btn.disabled = true;
-  btn.innerHTML = '&#x23F3;&nbsp; Enregistrement&hellip;';
+  btn.innerHTML = '⏳ Enregistrement<span id="mdots"></span>';
+  const mdotsEl = document.getElementById('mdots'); let md=0;
+  const mdTimer = setInterval(function(){ md=(md+1)%4; mdotsEl.textContent='.'.repeat(md); }, 400);
 
   const presence   = document.querySelector('input[name=presence]:checked')?.value || 'non';
   const accompagne = document.querySelector('input[name=accompagne]:checked')?.value || 'seul';
@@ -589,10 +598,12 @@ async function saveModif(){
     document.querySelector('.current-info').style.display = 'none';
     document.querySelector('.deadline-notice').style.display = 'none';
     document.getElementById('successModif').style.display = 'block';
+    clearInterval(mdTimer);
     toast('Modifications enregistrées !', 'ok');
 
   } catch(e){
     console.error(e);
+    clearInterval(mdTimer);
     toast('Erreur. Réessayez.', 'err');
     btn.disabled = false;
     btn.innerHTML = '&#x2713;&nbsp; Enregistrer les modifications';
