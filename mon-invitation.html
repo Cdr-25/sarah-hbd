@@ -442,7 +442,10 @@ const DEADLINE    = new Date('2026-07-17T23:59:59');
 
 /* Empêcher le flash bfcache */
 window.addEventListener('pageshow', function(e){
-  if(e.persisted){ window.location.reload(); }
+  if(e.persisted){
+    var sm=document.getElementById('successModif');
+    if(sm) sm.style.display='none';
+  }
 });
 
 /* Warm-up Supabase */
