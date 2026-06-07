@@ -440,6 +440,11 @@ const SUPABASE_URL = 'https://xbthhseeqidsnmvnfaya.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhidGhoc2VlcWlkc25tdm5mYXlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODI5MzgsImV4cCI6MjA5NTM1ODkzOH0.tQrDeZHY5GwnoUq47T8JWalpJBC0bzfaCZzF3z5jU1I';
 const DEADLINE    = new Date('2026-07-17T23:59:59');
 
+/* Empêcher le flash bfcache */
+window.addEventListener('pageshow', function(e){
+  if(e.persisted){ window.location.reload(); }
+});
+
 /* Warm-up Supabase */
 setTimeout(function(){
   fetch(SUPABASE_URL+'/rest/v1/rsvp?limit=1',{

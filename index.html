@@ -593,6 +593,11 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#fff5f8,#fc
 var SUPABASE_URL = 'https://xbthhseeqidsnmvnfaya.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhidGhoc2VlcWlkc25tdm5mYXlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODI5MzgsImV4cCI6MjA5NTM1ODkzOH0.tQrDeZHY5GwnoUq47T8JWalpJBC0bzfaCZzF3z5jU1I';
 
+/* Empêcher le flash bfcache : recharger si la page vient du cache navigateur */
+window.addEventListener('pageshow', function(e){
+  if(e.persisted){ window.location.reload(); }
+});
+
 /* Warm-up Supabase : réveille le serveur dès le chargement de la page */
 (function(){
   setTimeout(function(){
