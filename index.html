@@ -661,8 +661,8 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#fff5f8,#fc
   <!-- Compte à rebours (affiché avant le 18 juillet) -->
   <div class="map-countdown-box" id="map-countdown">
     <div class="cd-emoji">🗺️</div>
-    <h3>L'itinéraire arrive bientôt !</h3>
-    <p>Le plan d'accès sera disponible ici le<br>
+    <h3 id="cd-title">L'itinéraire arrive bientôt !</h3>
+    <p id="cd-msg">Le plan d'accès sera disponible ici le<br>
        <strong>18 juillet 2026 à partir de 8h00</strong>.<br><br>
        Pensez à revenir ce jour-là pour accéder au chemin. 💚</p>
   </div>
@@ -753,7 +753,7 @@ window.addEventListener('pageshow', function(e){
    TEST_MAP = true  → carte visible IMMÉDIATEMENT (tests)
    TEST_MAP = false → carte visible le 18 juillet 2026 à 8h00 seulement
    ══════════════════════════════════════════════════ */
-var TEST_MAP  = false;            // ← changer ici pour les tests
+var TEST_MAP  = true;            // ← changer ici pour les tests
 var MAP_LAT   = 4.007988;        // Domicile exact
 var MAP_LNG   = 9.834614;        // Domicile exact
 var MAP_LABEL = 'Domicile – Yassa, Douala (derrière le stade de Japoma)';
@@ -954,7 +954,7 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
     }
     clearInterval(dotsTimer);
     var modifLink=window.location.origin + '/mon-invitation?token=' + encodeURIComponent(returnedToken) + '&lang=' + (window._currentLang||'fr');
-    var waMsg='✨ Mon Invitation — Fête de Sarah 👑%0AModifiable une seule fois · Valable jusqu\'au 18 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
+    var t_=T[window._currentLang]||T.fr; var waMsg=t_.waMsgText+encodeURIComponent(modifLink);
     document.getElementById('rsvpForm').style.display='none';
     var sh=document.querySelector('.s-header');if(sh)sh.style.display='none';
     var sm=document.getElementById('successMsg');sm.style.display='block';
@@ -966,15 +966,10 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
     document.querySelector('.section-rsvp').style.alignItems='center';
     document.querySelector('.section-rsvp').style.justifyContent='center';
     // Texte selon présence ou absence
-    var dejaMsg = isUpdate ? '<br><span style="font-size:.78rem;color:#a08090;display:block;margin-top:8px">ℹ️ Vous étiez déjà enregistré(e). Votre réponse a été mise à jour.</span>' : '';
+    var t_=T[window._currentLang]||T.fr; var dejaMsg = isUpdate ? '<br><span style="font-size:.78rem;color:#a08090;display:block;margin-top:8px">'+t_.dejaMsg+'</span>' : '';
     if(presence==='oui'){
       var gpsEl=document.querySelector('.section-gps');if(gpsEl)gpsEl.style.display='none';
-      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, votre présence est confirmée ! 🎉<br>On vous attend pour fêter la petite princesse Sarah 👑<br><br>'
-      + '<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'
-      + '📍 <strong>L\'itinéraire GPS</strong> pour nous rejoindre sera disponible directement sur cette page '
-      + 'le <strong>18 juillet à partir de 8h00</strong>.<br>'
-      + 'Pensez à revenir ce jour-là pour accéder au chemin. À très bientôt&nbsp;! 💝'
-      + '</span>';
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, '+t_.successOui+'<br><br>'+'<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'+t_.successGps+'</span>'+dejaMsg;
       if(returnedToken){document.getElementById('waBtn').setAttribute('data-url','https://wa.me/?text='+waMsg);document.getElementById('waWrap').style.display='block';}
     } else {
       var hEl=document.querySelector('.hero');
@@ -985,10 +980,7 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
       if(gEl)gEl.style.display='none';
       var rEl=document.querySelector('.section-rsvp');
       if(rEl){rEl.style.minHeight='100vh';rEl.style.display='flex';rEl.style.alignItems='center';rEl.style.justifyContent='center';rEl.style.background='#fff8fb';}
-      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, nous avons bien noté votre absence. Sarah vous envoie tout son amour ! 💚<br><br>'
-      + '<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'
-      + 'Vous avez changé d\'avis ? Vous pouvez modifier votre réponse via le lien ci-dessous. 💝'
-      + '</span>' + dejaMsg;
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, '+t_.successNon+'<br><br>'+'<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'+t_.successNonSub+'</span>'+dejaMsg;
       if(returnedToken){document.getElementById('waBtn').setAttribute('data-url','https://wa.me/?text='+waMsg);document.getElementById('waWrap').style.display='block';}
     }
     launchBurst();
@@ -1106,7 +1098,18 @@ checkMapVisibility();
       gpsBtn:'🧭 Lancer la navigation GPS',
       kinertySub:'Contactez-nous pour vos projets en cliquant sur le lien ci-dessous',
       ftQuote:'« Chaque enfant est une bénédiction, un miracle vivant. Merci de partager ce moment si précieux avec nous. »',
-      ftDate:'18 Juillet 2026 · Yassa, Douala, Cameroun'
+      ftDate:'18 Juillet 2026 · Yassa, Douala, Cameroun',
+      /* Countdown GPS */
+      cdTitle:'L\'itinéraire arrive bientôt !',
+      cdMsg:'Le plan d\'accès sera disponible ici le<br><strong>18 juillet 2026 à partir de 8h00</strong>.<br><br>Pensez à revenir ce jour-là pour accéder au chemin. 💚',
+      /* Succès présence */
+      successOui:'votre présence est confirmée ! 🎉<br>On vous attend pour fêter la petite princesse Sarah 👑',
+      successGps:'📍 <strong>L\'itinéraire GPS</strong> pour nous rejoindre sera disponible directement sur cette page le <strong>18 juillet à partir de 8h00</strong>.<br>Pensez à revenir ce jour-là pour accéder au chemin. À très bientôt&nbsp;! 💝',
+      successNon:'nous avons bien noté votre absence. Sarah vous envoie tout son amour ! 💚',
+      successNonSub:'Vous avez changé d\'avis ? Vous pouvez modifier votre réponse via le lien ci-dessous. 💝',
+      dejaMsg:'ℹ️ Vous étiez déjà enregistré(e). Votre réponse a été mise à jour.',
+      /* Message WhatsApp */
+      waMsgText:'✨ Mon Invitation — Fête de Sarah 👑%0AModifiable une seule fois · Valable jusqu\'au 18 juillet 2026%0A%0A'
     },
     en:{
       eyebrow:'✨ Welcome to the celebration of ✨', tagline:'🎀 Birthday & Christening 🌸',
@@ -1139,7 +1142,18 @@ checkMapVisibility();
       gpsBtn:'🧭 Open GPS navigation',
       kinertySub:'Contact us for your projects by clicking the link below',
       ftQuote:'« Every child is a blessing, a living miracle. Thank you for sharing this precious moment with us. »',
-      ftDate:'18 July 2026 · Yassa, Douala, Cameroon'
+      ftDate:'18 July 2026 · Yassa, Douala, Cameroon',
+      /* Countdown GPS */
+      cdTitle:'The route is coming soon!',
+      cdMsg:'The directions will be available here on<br><strong>July 18, 2026 from 8:00 AM</strong>.<br><br>Remember to come back that day to access the route. 💚',
+      /* Succès présence */
+      successOui:'your attendance is confirmed! 🎉<br>We look forward to welcoming you to celebrate little princess Sarah 👑',
+      successGps:'📍 <strong>GPS directions</strong> to join us will be available directly on this page on <strong>July 18 from 8:00 AM</strong>.<br>Remember to come back that day. See you soon&nbsp;! 💝',
+      successNon:'we have noted your absence. Sarah sends you all her love! 💚',
+      successNonSub:'Changed your mind? You can update your response via the link below. 💝',
+      dejaMsg:'ℹ️ You were already registered. Your response has been updated.',
+      /* Message WhatsApp */
+      waMsgText:'✨ My Invitation — Sarah\'s Party 👑%0AEditable once · Valid until July 18, 2026%0A%0A'
     }
   };
 
@@ -1208,6 +1222,8 @@ checkMapVisibility();
     var gh=$('.section-gps .s-header h2'); if(gh) gh.textContent=t.gpsTitle;
     var gp=$('.section-gps .s-header p');  if(gp) gp.textContent=t.gpsSub;
     var gb=document.getElementById('map-directions-btn'); if(gb) gb.textContent=t.gpsBtn;
+    var cdT=document.getElementById('cd-title'); if(cdT) cdT.textContent=t.cdTitle;
+    var cdM=document.getElementById('cd-msg'); if(cdM) cdM.innerHTML=t.cdMsg;
     /* Footer */
     var ks=$('.kinerty-sub'); if(ks) ks.textContent=t.kinertySub;
     var fq=$('.ft-quote');    if(fq) fq.textContent=t.ftQuote;
