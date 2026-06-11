@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Njamen Atcheute Sarah · 1 an · Anniversaire & Bapteme</title>
+<!-- Style critique : affiche l'overlay AVANT tout chargement -->
+<style>
+#lang-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#fff5f8 0%,#fce8ef 35%,#fff0f4 60%,#fce8ef 80%,#fff5f8 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+#lang-overlay .lo-crown{font-size:3.5rem;margin-bottom:8px;}
+#lang-overlay .lo-name{font-size:clamp(3rem,10vw,5.5rem);font-weight:900;background:linear-gradient(130deg,#c9527a 0%,#e8809e 40%,#c9a85c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+#lang-overlay .lo-age{font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:#c9527a;margin-bottom:28px;}
+#lang-overlay .lo-question{font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:#a08090;margin-bottom:18px;}
+#lang-overlay .lo-btns{display:flex;gap:14px;}
+#lang-overlay .lo-btn{display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,255,255,.7);border:1.5px solid rgba(201,82,122,.25);border-radius:20px;padding:18px 32px;cursor:pointer;color:#2c1a22;min-width:130px;}
+#lang-overlay .lo-flag{font-size:2rem;line-height:1;}
+#lang-overlay .lo-lang{font-size:.85rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;}
+#lang-overlay .lo-sub{font-size:.65rem;opacity:.6;letter-spacing:.08em;}
+body>*:not(#lang-overlay){visibility:hidden;}
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
@@ -327,9 +341,113 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#fff5f8,#fc
 .cal-icon{width:38px;height:38px;background:#fff;border-radius:8px;border:2px solid rgba(255,255,255,.5);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .cal-top{background:#c9527a;height:11px;width:100%}
 .cal-day{flex:1;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:#c9527a;line-height:1}
+
+/* ═══ SÉLECTEUR DE LANGUE ═══ */
+#lang-overlay {
+  position:fixed; inset:0; z-index:9999;
+  background:linear-gradient(160deg, #fff5f8 0%, #fce8ef 35%, #fff0f4 60%, #fce8ef 80%, #fff5f8 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:24px;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+#lang-overlay.hiding { opacity:0; visibility:hidden; pointer-events:none; }
+#lang-overlay .lo-petals { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+#lang-overlay .lo-petal {
+  position:absolute; font-size:1.2rem; opacity:0;
+  animation:lo-petal-fall linear infinite;
+}
+@keyframes lo-petal-fall {
+  0%   { transform:translateY(-40px) rotate(0deg) scale(.8);  opacity:0; }
+  10%  { opacity:.7; }
+  90%  { opacity:.3; }
+  100% { transform:translateY(110vh) rotate(540deg) scale(1.2); opacity:0; }
+}
+#lang-overlay .lo-crown {
+  font-size:3.5rem; margin-bottom:8px;
+  animation:lo-crown-float 2.2s ease-in-out infinite;
+  filter:drop-shadow(0 4px 20px rgba(201,82,122,.3));
+}
+@keyframes lo-crown-float {
+  0%,100%{ transform:translateY(0) rotate(-5deg); }
+  50%    { transform:translateY(-10px) rotate(5deg); }
+}
+#lang-overlay .lo-name {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3rem,10vw,5.5rem);
+  font-weight:900; line-height:.9;
+  background:linear-gradient(130deg,#c9527a 0%,#e8809e 40%,#c9a85c 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:6px;
+  animation:lo-name-in .8s cubic-bezier(.34,1.4,.64,1) both .3s;
+}
+@keyframes lo-name-in {
+  from{ opacity:0; transform:scale(.7) translateY(20px); }
+  to  { opacity:1; transform:scale(1) translateY(0); }
+}
+#lang-overlay .lo-age {
+  font-family:'Jost',sans-serif; font-size:.75rem; font-weight:500;
+  letter-spacing:.35em; text-transform:uppercase; color:#c9527a;
+  margin-bottom:28px;
+  animation:lo-name-in .8s cubic-bezier(.34,1.4,.64,1) both .5s;
+}
+#lang-overlay .lo-question {
+  font-family:'Jost',sans-serif; font-size:.8rem; font-weight:400;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:#a08090; margin-bottom:18px;
+  animation:lo-name-in .6s ease both .7s;
+}
+#lang-overlay .lo-btns {
+  display:flex; gap:14px;
+  animation:lo-name-in .6s ease both .9s;
+}
+#lang-overlay .lo-btn {
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  background:rgba(255,255,255,.7); border:1.5px solid rgba(201,82,122,.25);
+  border-radius:20px; padding:18px 32px; cursor:pointer;
+  font-family:'Jost',sans-serif; color:#2c1a22; text-decoration:none;
+  transition:all .3s cubic-bezier(.34,1.4,.64,1);
+  min-width:130px;
+}
+#lang-overlay .lo-btn:hover, #lang-overlay .lo-btn:focus {
+  background:white; border-color:#c9527a;
+  transform:translateY(-6px) scale(1.04);
+  box-shadow:0 16px 40px rgba(201,82,122,.2);
+}
+#lang-overlay .lo-btn .lo-flag { font-size:2rem; line-height:1; }
+#lang-overlay .lo-btn .lo-lang { font-size:.85rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+#lang-overlay .lo-btn .lo-sub  { font-size:.65rem; opacity:.6; letter-spacing:.08em; }
+#lang-overlay .lo-sparkles {
+  position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+  font-size:.65rem; letter-spacing:.2em; text-transform:uppercase;
+  color:#c9a0b0; text-align:center;
+  animation:lo-name-in .6s ease both 1.1s;
+}
 </style>
 </head>
 <body>
+
+
+<!-- ═══ SÉLECTEUR DE LANGUE ═══ -->
+<div id="lang-overlay" role="dialog" aria-label="Choisissez votre langue / Choose your language">
+  <div class="lo-petals" id="lo-petals"></div>
+  <div class="lo-crown">👑</div>
+  <div class="lo-name">Sarah</div>
+  <div class="lo-age">✦ 1 an &nbsp;·&nbsp; Birthday &amp; Baptême ✦</div>
+  <div class="lo-question">Choisissez votre langue &nbsp;/&nbsp; Choose your language</div>
+  <div class="lo-btns">
+    <button class="lo-btn" id="btn-fr" onclick="chooseLang('fr')" aria-label="Français">
+      <span class="lo-flag">🇫🇷</span>
+      <span class="lo-lang">Français</span>
+      <span class="lo-sub">Continuer →</span>
+    </button>
+    <button class="lo-btn" id="btn-en" onclick="chooseLang('en')" aria-label="English">
+      <span class="lo-flag">🇬🇧</span>
+      <span class="lo-lang">English</span>
+      <span class="lo-sub">Continue →</span>
+    </button>
+  </div>
+  <div class="lo-sparkles">🌸 &nbsp; 18 Juillet 2026 &nbsp;·&nbsp; July 18, 2026 &nbsp;·&nbsp; Douala &nbsp; 🌸</div>
+</div>
 
 <canvas id="bg-canvas"></canvas>
 <div id="burst"></div>
@@ -543,8 +661,8 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#fff5f8,#fc
   <!-- Compte à rebours (affiché avant le 18 juillet) -->
   <div class="map-countdown-box" id="map-countdown">
     <div class="cd-emoji">🗺️</div>
-    <h3>L'itinéraire arrive bientôt !</h3>
-    <p>Le plan d'accès sera disponible ici le<br>
+    <h3 id="cd-title">L'itinéraire arrive bientôt !</h3>
+    <p id="cd-msg">Le plan d'accès sera disponible ici le<br>
        <strong>18 juillet 2026 à partir de 8h00</strong>.<br><br>
        Pensez à revenir ce jour-là pour accéder au chemin. 💚</p>
   </div>
@@ -568,7 +686,9 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#fff5f8,#fc
 
     <!-- Bouton GPS natif -->
     <div class="map-directions-wrap">
-      <button id="map-directions-btn" type="button" class="map-directions-btn">
+      <button id="map-directions-btn" type="button" class="map-directions-btn"
+        data-fr="🧭 &nbsp;Lancer la navigation GPS"
+        data-en="🧭 &nbsp;Open GPS navigation">
         🧭 &nbsp;Lancer la navigation GPS
       </button>
     </div>
@@ -593,18 +713,27 @@ footer{position:relative;z-index:2;background:linear-gradient(170deg,#fff5f8,#fc
 var SUPABASE_URL = 'https://xbthhseeqidsnmvnfaya.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhidGhoc2VlcWlkc25tdm5mYXlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODI5MzgsImV4cCI6MjA5NTM1ODkzOH0.tQrDeZHY5GwnoUq47T8JWalpJBC0bzfaCZzF3z5jU1I';
 
-/* Empêcher le flash bfcache : masquer instantanément sans recharger */
+/* Fix flash bfcache : au retour cache navigateur, masquer tout ce qui aurait pu être modifié par JS */
 window.addEventListener('pageshow', function(e){
   if(e.persisted){
+    // Masquer la page succès
     var sm=document.getElementById('successMsg');
-    if(sm) sm.style.display='none';
+    if(sm){ sm.style.cssText='display:none!important'; }
+    // Restaurer la section RSVP
     var sr=document.querySelector('.section-rsvp');
-    if(sr){ sr.style.background=''; sr.style.minHeight=''; sr.style.display=''; sr.style.alignItems=''; sr.style.justifyContent=''; }
-    var hero=document.querySelector('.hero'); if(hero) hero.style.display='';
-    var sInfos=document.querySelector('.section-infos'); if(sInfos) sInfos.style.display='';
-    var sGps=document.querySelector('.section-gps'); if(sGps) sGps.style.display='';
-    var sh=document.querySelector('.s-header'); if(sh) sh.style.display='';
-    var form=document.getElementById('rsvpForm'); if(form) form.style.display='';
+    if(sr){ sr.removeAttribute('style'); }
+    // Restaurer tous les éléments cachés
+    var els=['.hero','.hero-wave','.section-infos','.section-gps','.s-header','#rsvpForm','.rsvp-wrap'];
+    els.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){ el.removeAttribute('style'); });
+    });
+    // Restaurer le formulaire
+    var form=document.getElementById('rsvpForm'); if(form) form.removeAttribute('style');
+    var pg=document.getElementById('presence-group'); if(pg) pg.removeAttribute('style');
+    var wa=document.getElementById('waWrap'); if(wa) wa.style.display='none';
+    var am=document.getElementById('row-absent-msg'); if(am) am.style.display='none';
+    // Reset radio buttons
+    document.querySelectorAll('input[name=presence], input[name=accompagne]').forEach(function(r){ r.checked=false; });
   }
 });
 
@@ -624,7 +753,7 @@ window.addEventListener('pageshow', function(e){
    TEST_MAP = true  → carte visible IMMÉDIATEMENT (tests)
    TEST_MAP = false → carte visible le 18 juillet 2026 à 8h00 seulement
    ══════════════════════════════════════════════════ */
-var TEST_MAP  = false;            // ← changer ici pour les tests
+var TEST_MAP  = true;            // ← changer ici pour les tests
 var MAP_LAT   = 4.007988;        // Domicile exact
 var MAP_LNG   = 9.834614;        // Domicile exact
 var MAP_LABEL = 'Domicile – Yassa, Douala (derrière le stade de Japoma)';
@@ -688,7 +817,7 @@ function onPresence(){
   var badge=document.getElementById('badge-presence');
   if(present){
     document.getElementById('badge-presence-emoji').textContent='🎉';
-    document.getElementById('badge-presence-text').textContent='Je serai là !';
+    document.getElementById('badge-presence-text').textContent=(window._currentLang==='en'?'I will be there!':'Je serai là !');
     badge.classList.add('show');
     resetPresence.style.display='inline-flex';
     showEl('row-identite');showEl('row-accomp-q');showEl('row-msg');showEl('btn-rsvp-wrap');
@@ -739,13 +868,13 @@ function onAccomp(){
   var badge=document.getElementById('badge-accomp');
   if(groupe){
     document.getElementById('badge-accomp-emoji').innerHTML='&#x1F46A;';
-    document.getElementById('badge-accomp-text').textContent='Je serai accompagné(e)';
+    document.getElementById('badge-accomp-text').textContent=(window._currentLang==='en'?'Coming with company':'Je serai accompagné(e)');
     badge.classList.add('show');
     resetAccomp.style.display='inline-flex';
     showEl('row-groupe');
   } else if(seul){
     document.getElementById('badge-accomp-emoji').textContent='🙋';
-    document.getElementById('badge-accomp-text').textContent='Je viens seul(e)';
+    document.getElementById('badge-accomp-text').textContent=(window._currentLang==='en'?'Coming alone':'Je viens seul(e)');
     badge.classList.add('show');
     resetAccomp.style.display='inline-flex';
     hideEl('row-groupe');
@@ -798,10 +927,13 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
   var data={prenom:prenom,nom:nom,presence:presence,accompagne:ac,nb_adultes:nbA,nb_enfants:nbE,message:document.getElementById('message').value.trim(),token:token};
   try{
     // Vérifier si la personne existe déjà (insensible à la casse)
-    var checkRes=await fetch(SUPABASE_URL+'/rest/v1/rsvp?prenom=ilike.'+encodeURIComponent(prenom)+'&nom=ilike.'+encodeURIComponent(nom)+'&select=id,token',{
-      headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
-    });
-    var existing=await checkRes.json();
+    var existing=[];
+    try{
+      var checkRes=await fetch(SUPABASE_URL+'/rest/v1/rsvp?prenom=eq.'+encodeURIComponent(prenom)+'&nom=eq.'+encodeURIComponent(nom)+'&select=id,token',{
+        headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}
+      });
+      if(checkRes.ok){ var parsed=await checkRes.json(); if(Array.isArray(parsed)) existing=parsed; }
+    }catch(e){ existing=[]; }
     var res, result, returnedToken, isUpdate=false;
     if(existing && existing.length > 0){
       // Personne déjà enregistrée → on met à jour au lieu de créer
@@ -824,8 +956,8 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
       returnedToken=(result[0]&&result[0].token)?result[0].token:token;
     }
     clearInterval(dotsTimer);
-    var modifLink=window.location.origin + '/mon-invitation?token=' + encodeURIComponent(returnedToken);
-    var waMsg='✨ Mon Invitation — Fête de Sarah 👑%0AModifiable une seule fois · Valable jusqu\'au 18 juillet 2026%0A%0A'+encodeURIComponent(modifLink);
+    var modifLink=window.location.origin + '/mon-invitation?token=' + encodeURIComponent(returnedToken) + '&lang=' + (window._currentLang||'fr');
+    var t_=T[window._currentLang]||T.fr; var waMsg=t_.waMsgText+encodeURIComponent(modifLink);
     document.getElementById('rsvpForm').style.display='none';
     var sh=document.querySelector('.s-header');if(sh)sh.style.display='none';
     var sm=document.getElementById('successMsg');sm.style.display='block';
@@ -837,15 +969,10 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
     document.querySelector('.section-rsvp').style.alignItems='center';
     document.querySelector('.section-rsvp').style.justifyContent='center';
     // Texte selon présence ou absence
-    var dejaMsg = isUpdate ? '<br><span style="font-size:.78rem;color:#a08090;display:block;margin-top:8px">ℹ️ Vous étiez déjà enregistré(e). Votre réponse a été mise à jour.</span>' : '';
+    var t_=T[window._currentLang]||T.fr; var dejaMsg = isUpdate ? '<br><span style="font-size:.78rem;color:#a08090;display:block;margin-top:8px">'+t_.dejaMsg+'</span>' : '';
     if(presence==='oui'){
       var gpsEl=document.querySelector('.section-gps');if(gpsEl)gpsEl.style.display='none';
-      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, votre présence est confirmée ! 🎉<br>On vous attend pour fêter la petite princesse Sarah 👑<br><br>'
-      + '<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'
-      + '📍 <strong>L\'itinéraire GPS</strong> pour nous rejoindre sera disponible directement sur cette page '
-      + 'le <strong>18 juillet à partir de 8h00</strong>.<br>'
-      + 'Pensez à revenir ce jour-là pour accéder au chemin. À très bientôt&nbsp;! 💝'
-      + '</span>';
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, '+t_.successOui+'<br><br>'+'<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'+t_.successGps+'</span>'+dejaMsg;
       if(returnedToken){document.getElementById('waBtn').setAttribute('data-url','https://wa.me/?text='+waMsg);document.getElementById('waWrap').style.display='block';}
     } else {
       var hEl=document.querySelector('.hero');
@@ -856,16 +983,14 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
       if(gEl)gEl.style.display='none';
       var rEl=document.querySelector('.section-rsvp');
       if(rEl){rEl.style.minHeight='100vh';rEl.style.display='flex';rEl.style.alignItems='center';rEl.style.justifyContent='center';rEl.style.background='#fff8fb';}
-      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, nous avons bien noté votre absence. Sarah vous envoie tout son amour ! 💚<br><br>'
-      + '<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'
-      + 'Vous avez changé d\'avis ? Vous pouvez modifier votre réponse via le lien ci-dessous. 💝'
-      + '</span>' + dejaMsg;
+      document.getElementById('successText').innerHTML='<strong>'+data.prenom+'</strong>, '+t_.successNon+'<br><br>'+'<span style="font-size:.85rem;color:#5a7060;line-height:1.7;display:block;margin-top:6px">'+t_.successNonSub+'</span>'+dejaMsg;
       if(returnedToken){document.getElementById('waBtn').setAttribute('data-url','https://wa.me/?text='+waMsg);document.getElementById('waWrap').style.display='block';}
     }
     launchBurst();
   }catch(err){
-    console.error(err);clearInterval(dotsTimer);btn.disabled=false;btn.innerHTML='🎀 Confirmer ma présence';
-    document.getElementById('formError').textContent='Erreur de connexion. Veuillez reessayer.';
+    console.error(err);clearInterval(dotsTimer);btn.disabled=false;btn.innerHTML=(window._currentLang==='en'?'🎀 Confirm my attendance':'🎀 Confirmer ma présence');
+    var t__=T[window._currentLang]||T.fr;
+    document.getElementById('formError').textContent=t__.connErr||'Erreur de connexion. Veuillez réessayer.';
     document.getElementById('formError').classList.add('show');
   }
 });
@@ -927,6 +1052,229 @@ function checkMapVisibility(){
 }
 
 checkMapVisibility();
+
+/* ═══ SÉLECTEUR DE LANGUE ═══ */
+(function(){
+
+  /* Pétales animés dans l'overlay */
+  var petals = document.getElementById('lo-petals');
+  var petalEmojis = ['🌸','🌺','✨','💫','🌷','⭐','💝','🎀','🌼','🦋'];
+  for(var i=0;i<22;i++){
+    var p=document.createElement('span'); p.className='lo-petal';
+    p.textContent=petalEmojis[i%petalEmojis.length];
+    p.style.left=(Math.random()*100)+'%';
+    p.style.animationDuration=(4+Math.random()*6)+'s';
+    p.style.animationDelay=(Math.random()*4)+'s';
+    p.style.fontSize=(.65+Math.random()*.9)+'rem';
+    if(petals) petals.appendChild(p);
+  }
+
+  /* ── Toutes les traductions ── */
+  var T = {
+    fr:{
+      eyebrow:'✨ Bienvenue à la fête de ✨', tagline:'🎀 Anniversaire & Baptême 🌸',
+      heroMsg:'Coucou\u00a0! 👋 Je m\'appelle <strong>Sarah</strong>, et dans quelques jours je vais avoir <strong>1\u00a0an</strong>\u00a0! 🎂<br>Pour ce grand jour, mes parents m\'offrent la grâce de recevoir le sacrement du <strong>Baptême</strong>. 🙏',
+      dateLabel:'Date de la fête', dateTitle:'Samedi 18 Juillet 2026',
+      churchLabel:'Cérémonie religieuse', churchTime:'10h00 précises',
+      churchSub:'Paroisse Notre-Dame de l\'Annonciation<br><span>Bonamoussadi, Douala</span>',
+      mealLabel:'Repas festif', mealTime:'15h00',
+      mealSub:'À notre domicile · Yassa, Douala<br><span>Derrière le stade de Japoma — fin du parking, entrée à votre gauche</span>',
+      heroCta:'Merci de confirmer votre venue ci-dessous. Votre présence sera le plus beau des cadeaux. 💝',
+      scrollBtn:'Confirmer ma présence',
+      rsvpTitle:'Confirmer ma présence', rsvpSub:'Aidez-nous à préparer le plus beau des accueils.',
+      presenceLabel:'Votre présence *', yesCard:'Je serai là !', noCard:'Je ne serai pas là',
+      absentMsg:'Pas de souci, l\'essentiel c\'est que vous pensiez à elle.<br>Sarah vous envoie tout son amour quand même\u00a0!',
+      modifyBtn:'↩ Modifier mon choix',
+      prenomLabel:'Prénom *', nomLabel:'Nom *', prenomPh:'Votre prénom', nomPh:'Votre nom',
+      accompQ:'Serez-vous accompagné(e)\u00a0? *',
+      seulCard:'Je viens seul(e)', accompCard:'Je serai accompagné(e)',
+      adultesLabel:'👤 Adultes *', enfantsLabel:'🧒 Enfants *',
+      adultesPh:'Nombre d\'adultes', enfantsPh:'Nombre d\'enfants',
+      msgLabel:'Un mot pour Sarah 💕', msgPh:'Un message doux pour la petite princesse...',
+      submitBtn:'🎀 Confirmer ma présence',
+      formErr:'Veuillez remplir tous les champs obligatoires.',
+      connErr:'Erreur de connexion. Veuillez réessayer.',
+      errPresence:'Veuillez indiquer votre présence.', errPrenom:'Le prénom est requis.',
+      errNom:'Le nom est requis.', errAccomp:'Veuillez indiquer si vous venez seul ou accompagné.',
+      errAdultes:'Requis.', errEnfants:'Requis (0 si aucun).',
+      successTitle:'Merci\u00a0!', waBtnLabel:'📲 Sauvegarder mon lien de modification',
+      waNote:'Modifiable jusqu\'au <strong>17 juillet 2026</strong>',
+      gpsTitle:'📍 Nous rejoindre', gpsSub:'Repas festif · Yassa, Douala',
+      gpsBtn:'🧭 Lancer la navigation GPS',
+      kinertySub:'Contactez-nous pour vos projets en cliquant sur le lien ci-dessous',
+      ftQuote:'« Chaque enfant est une bénédiction, un miracle vivant. Merci de partager ce moment si précieux avec nous. »',
+      ftDate:'18 Juillet 2026 · Yassa, Douala, Cameroun',
+      /* Countdown GPS */
+      cdTitle:'L\'itinéraire arrive bientôt !',
+      cdMsg:'Le plan d\'accès sera disponible ici le<br><strong>18 juillet 2026 à partir de 8h00</strong>.<br><br>Pensez à revenir ce jour-là pour accéder au chemin. 💚',
+      /* Succès présence */
+      successOui:'votre présence est confirmée ! 🎉<br>On vous attend pour fêter la petite princesse Sarah 👑',
+      successGps:'📍 <strong>L\'itinéraire GPS</strong> pour nous rejoindre sera disponible directement sur cette page le <strong>18 juillet à partir de 8h00</strong>.<br>Pensez à revenir ce jour-là pour accéder au chemin. À très bientôt&nbsp;! 💝',
+      successNon:'nous avons bien noté votre absence. Sarah vous envoie tout son amour ! 💚',
+      successNonSub:'Vous avez changé d\'avis ? Vous pouvez modifier votre réponse via le lien ci-dessous. 💝',
+      dejaMsg:'ℹ️ Vous étiez déjà enregistré(e). Votre réponse a été mise à jour.',
+      /* Message WhatsApp */
+      waMsgText:'✨ Mon Invitation — Fête de Sarah 👑%0AModifiable une seule fois · Valable jusqu\'au 18 juillet 2026%0A%0A'
+    },
+    en:{
+      eyebrow:'✨ Welcome to the celebration of ✨', tagline:'🎀 Birthday & Christening 🌸',
+      heroMsg:'Hello\u00a0! 👋 My name is <strong>Sarah</strong>, and in just a few days I will be <strong>1\u00a0year old</strong>\u00a0! 🎂<br>For this special day, my parents are giving me the grace of receiving the sacrament of <strong>Christening</strong>. 🙏',
+      dateLabel:'Date of celebration', dateTitle:'Saturday July 18, 2026',
+      churchLabel:'Religious ceremony', churchTime:'10:00 AM sharp',
+      churchSub:'Notre-Dame de l\'Annonciation Parish<br><span>Bonamoussadi, Douala</span>',
+      mealLabel:'Festive reception', mealTime:'3:00 PM',
+      mealSub:'At our home · Yassa, Douala<br><span>Behind Japoma Stadium — end of the parking lot, entrance on your left</span>',
+      heroCta:'Please confirm your attendance below. Your presence will be the most beautiful gift. 💝',
+      scrollBtn:'Confirm attendance',
+      rsvpTitle:'Confirm your attendance', rsvpSub:'Help us prepare the most beautiful welcome.',
+      presenceLabel:'Your attendance *', yesCard:'I will be there!', noCard:'I will not be there',
+      absentMsg:'No worries, what matters is that you think of her.<br>Sarah sends you all her love anyway\u00a0!',
+      modifyBtn:'↩ Change my choice',
+      prenomLabel:'First name *', nomLabel:'Last name *', prenomPh:'Your first name', nomPh:'Your last name',
+      accompQ:'Will you be coming with company\u00a0? *',
+      seulCard:'Coming alone', accompCard:'Coming with company',
+      adultesLabel:'👤 Adults *', enfantsLabel:'🧒 Children *',
+      adultesPh:'Number of adults', enfantsPh:'Number of children',
+      msgLabel:'A word for Sarah 💕', msgPh:'A sweet message for the little princess...',
+      submitBtn:'🎀 Confirm my attendance',
+      formErr:'Please fill in all required fields.',
+      connErr:'Connection error. Please try again.',
+      errPresence:'Please indicate your attendance.', errPrenom:'First name is required.',
+      errNom:'Last name is required.', errAccomp:'Please indicate if coming alone or with company.',
+      errAdultes:'Required.', errEnfants:'Required (0 if none).',
+      successTitle:'Thank you!', waBtnLabel:'📲 Save my modification link',
+      waNote:'Modifiable until <strong>July 17, 2026</strong>',
+      gpsTitle:'📍 Join us', gpsSub:'Festive reception · Yassa, Douala',
+      gpsBtn:'🧭 Open GPS navigation',
+      kinertySub:'Contact us for your projects by clicking the link below',
+      ftQuote:'« Every child is a blessing, a living miracle. Thank you for sharing this precious moment with us. »',
+      ftDate:'18 July 2026 · Yassa, Douala, Cameroon',
+      /* Countdown GPS */
+      cdTitle:'The route is coming soon!',
+      cdMsg:'The directions will be available here on<br><strong>July 18, 2026 from 8:00 AM</strong>.<br><br>Remember to come back that day to access the route. 💚',
+      /* Succès présence */
+      successOui:'your attendance is confirmed! 🎉<br>We look forward to welcoming you to celebrate little princess Sarah 👑',
+      successGps:'📍 <strong>GPS directions</strong> to join us will be available directly on this page on <strong>July 18 from 8:00 AM</strong>.<br>Remember to come back that day. See you soon&nbsp;! 💝',
+      successNon:'we have noted your absence. Sarah sends you all her love! 💚',
+      successNonSub:'Changed your mind? You can update your response via the link below. 💝',
+      dejaMsg:'ℹ️ You were already registered. Your response has been updated.',
+      /* Message WhatsApp */
+      waMsgText:'✨ My Invitation — Sarah\'s Party 👑%0AEditable once · Valid until July 18, 2026%0A%0A'
+    }
+  };
+
+  /* ── Appliquer la langue à tout le DOM ── */
+  function applyLang(lang){
+    var t=T[lang]||T.fr;
+    var $=function(s){return document.querySelector(s);};
+    var $$=function(s){return document.querySelectorAll(s);};
+    /* Hero */
+    $$('.eyebrow').forEach(function(e){e.textContent=t.eyebrow;});
+    $$('.hero-tagline').forEach(function(e){e.textContent=t.tagline;});
+    var hmp=$('.hm-p'); if(hmp) hmp.innerHTML=t.heroMsg;
+    var hmc=$('.hm-cta'); if(hmc) hmc.textContent=t.heroCta;
+    var sc=$('.scroll-cta span'); if(sc) sc.textContent=t.scrollBtn;
+    /* Cards info */
+    var labels=$$('.hm-label'),titles=$$('.hm-title'),subs=$$('.hm-sub');
+    if(labels[0])labels[0].textContent=t.dateLabel; if(titles[0])titles[0].textContent=t.dateTitle;
+    if(labels[1])labels[1].textContent=t.churchLabel; if(titles[1])titles[1].textContent=t.churchTime; if(subs[0])subs[0].innerHTML=t.churchSub;
+    if(labels[2])labels[2].textContent=t.mealLabel; if(titles[2])titles[2].textContent=t.mealTime; if(subs[1])subs[1].innerHTML=t.mealSub;
+    /* RSVP header */
+    var sh2=$('.s-header h2'); if(sh2) sh2.textContent=t.rsvpTitle;
+    var shp=$('.s-header p');  if(shp) shp.textContent=t.rsvpSub;
+    /* Formulaire erreur globale */
+    var fe=document.getElementById('formError'); if(fe) fe.textContent=t.formErr;
+    /* Présence radios */
+    var yl=$('#opt-present .r-label'); if(yl) yl.textContent=t.yesCard;
+    var nl=$('#opt-absent .r-label');  if(nl) nl.textContent=t.noCard;
+    /* Message absent + boutons reset */
+    var ap=$('#row-absent-msg p'); if(ap) ap.innerHTML=t.absentMsg;
+    $$('.btn-reset').forEach(function(b){b.textContent=t.modifyBtn;});
+    /* Labels champs — exclure les radio-opts qui ont leur propre traduction */
+    $$('.field label:not(.radio-opt)').forEach(function(l){
+      var tx=l.textContent.trim();
+      if(tx.match(/^(Votre\s+)?[Pp]r[eé]sence/)||tx.match(/^Your\s+att/)) l.textContent=t.presenceLabel;
+      else if(tx.match(/^[Pp]r[eé]nom/)||tx.match(/^First\s+name/))        l.textContent=t.prenomLabel;
+      else if(tx.match(/^Nom\s*\*/)||tx.match(/^Last\s+name/))             l.textContent=t.nomLabel;
+      else if(tx.match(/Serez-vous|accompagn.*\?|Will you be/i))           l.textContent=t.accompQ;
+      else if(tx.match(/[Aa]dultes?/)||tx.match(/[Aa]dults?/))             l.textContent=t.adultesLabel;
+      else if(tx.match(/[Ee]nfants?/)||tx.match(/[Cc]hildren/))            l.textContent=t.enfantsLabel;
+      else if(tx.match(/mot pour/i)||tx.match(/word for/i))                l.textContent=t.msgLabel;
+    });
+    /* Placeholders */
+    var pi=document.getElementById('prenom');     if(pi) pi.placeholder=t.prenomPh;
+    var ni=document.getElementById('nom');        if(ni) ni.placeholder=t.nomPh;
+    var na=document.getElementById('nb-adultes'); if(na) na.placeholder=t.adultesPh;
+    var ne=document.getElementById('nb-enfants'); if(ne) ne.placeholder=t.enfantsPh;
+    var mi=document.getElementById('message');    if(mi) mi.placeholder=t.msgPh;
+    /* Accompagnement radios */
+    var sl=$('#opt-seul .r-label');   if(sl) sl.textContent=t.seulCard;
+    var al=$('#opt-accomp .r-label'); if(al) al.textContent=t.accompCard;
+    /* Erreurs champs */
+    var ep=document.getElementById('err-presence'); if(ep) ep.textContent=t.errPresence;
+    var epr=document.getElementById('err-prenom');  if(epr) epr.textContent=t.errPrenom;
+    var en2=document.getElementById('err-nom');     if(en2) en2.textContent=t.errNom;
+    var eac=document.getElementById('err-accomp');  if(eac) eac.textContent=t.errAccomp;
+    var ead=document.getElementById('err-adultes'); if(ead) ead.textContent=t.errAdultes;
+    var een=document.getElementById('err-enfants'); if(een) een.textContent=t.errEnfants;
+    /* Bouton submit */
+    var sb=$('.btn-rsvp'); if(sb) sb.innerHTML=t.submitBtn;
+    /* Succès */
+    var st=$('#successMsg h3'); if(st) st.textContent=t.successTitle;
+    var wasvg='<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+    var wb=document.getElementById('waBtn'); if(wb) wb.innerHTML=wasvg+' '+t.waBtnLabel;
+    var wn=$('.wa-note'); if(wn) wn.innerHTML=t.waNote;
+    /* GPS */
+    var gh=$('.section-gps .s-header h2'); if(gh) gh.textContent=t.gpsTitle;
+    var gp=$('.section-gps .s-header p');  if(gp) gp.textContent=t.gpsSub;
+    var gb=document.getElementById('map-directions-btn'); if(gb) gb.textContent=t.gpsBtn;
+    var cdT=document.getElementById('cd-title'); if(cdT) cdT.textContent=t.cdTitle;
+    var cdM=document.getElementById('cd-msg'); if(cdM) cdM.innerHTML=t.cdMsg;
+    /* Footer */
+    var ks=$('.kinerty-sub'); if(ks) ks.textContent=t.kinertySub;
+    var fq=$('.ft-quote');    if(fq) fq.textContent=t.ftQuote;
+    var fd=$('.ft-date');     if(fd) fd.textContent=t.ftDate;
+    window._currentLang=lang;
+  }
+
+  /* ── Choisir la langue (clic overlay) ── */
+  window.chooseLang=function(lang){
+    try{sessionStorage.setItem('sarah_lang_bfcache',lang);}catch(e){}
+    applyLang(lang);
+    try{sessionStorage.setItem('sarah_lang',lang);}catch(e){}
+    var ov=document.getElementById('lang-overlay');
+    ov.classList.add('hiding');
+    /* Rendre tout le contenu visible maintenant que la langue est choisie */
+    document.querySelectorAll('body>*:not(#lang-overlay)').forEach(function(el){el.style.visibility='visible';});
+    setTimeout(function(){ov.style.display='none';},650);
+  };
+
+  /* ── pageshow : gérer le retour arrière (bfcache) ── */
+  window.addEventListener('pageshow',function(e){
+    if(e.persisted){
+      /* Cacher la page succès si elle était affichée */
+      var sm=document.getElementById('successMsg');
+      if(sm) sm.style.cssText='display:none!important';
+      var sr=document.querySelector('.section-rsvp'); if(sr) sr.removeAttribute('style');
+      ['.hero','.hero-wave','.section-infos','.section-gps','.s-header','#rsvpForm','.rsvp-wrap'].forEach(function(s){
+        document.querySelectorAll(s).forEach(function(el){el.removeAttribute('style');});
+      });
+      document.querySelectorAll('input[name=presence],input[name=accompagne]').forEach(function(r){r.checked=false;});
+      var wa=document.getElementById('waWrap'); if(wa) wa.style.display='none';
+      var am=document.getElementById('row-absent-msg'); if(am) am.style.display='none';
+      /* Ré-appliquer la langue ET cacher l'overlay (déjà choisi dans cette session) */
+      var sl; try{sl=sessionStorage.getItem('sarah_lang_bfcache');}catch(e){}
+      if(sl){
+        applyLang(sl);
+        var ov=document.getElementById('lang-overlay'); if(ov) ov.style.display='none';
+        /* Contenu visible car langue déjà choisie */
+        document.querySelectorAll('body>*:not(#lang-overlay)').forEach(function(el){el.style.visibility='visible';});
+      }
+    }
+    /* Première ouverture ou retour hors bfcache : NE PAS cacher l'overlay — l'invité DOIT choisir */
+  });
+
+})();
 </script>
 </body>
 </html>

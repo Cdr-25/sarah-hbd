@@ -280,7 +280,7 @@ body {
   <div class="screen-emoji">🔒</div>
   <h2>Lien déjà utilisé</h2>
   <p>Vous avez déjà effectué votre modification.<br>
-     Ce lien n'est valable qu'<strong>une seule fois</strong>.<br><br>
+     Ce lien n\'est valable qu\'<strong>une seule fois</strong>.<br><br>
      Pour toute question, contactez directement l'organisatrice.</p>
 </div>
 
@@ -299,7 +299,7 @@ body {
   <h2>Présence annulée</h2>
   <p>Votre présence a bien été annulée.<br>
      Sarah sera heureuse de savoir que vous pensiez à elle 💕<br><br>
-     Si vous changez d'avis, contactez l'organisatrice.</p>
+     Si vous changez d\'avis, contactez l\'organisatrice.</p>
 </div>
 
 <!-- ── CARTE PRINCIPALE ── -->
@@ -313,7 +313,7 @@ body {
 
   <!-- Date limite -->
   <div class="deadline-notice">
-    ⏱️ Modifications possibles jusqu'au <strong>&nbsp;17 juillet 2026</strong>
+    ⏱️ Modifications possibles jusqu\'au <strong>&nbsp;17 juillet 2026</strong>
   </div>
 
   <!-- Infos actuelles -->
@@ -440,13 +440,219 @@ const SUPABASE_URL = 'https://xbthhseeqidsnmvnfaya.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhidGhoc2VlcWlkc25tdm5mYXlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODI5MzgsImV4cCI6MjA5NTM1ODkzOH0.tQrDeZHY5GwnoUq47T8JWalpJBC0bzfaCZzF3z5jU1I';
 const DEADLINE    = new Date('2026-07-17T23:59:59');
 
-/* Empêcher le flash bfcache */
+/* Fix flash bfcache */
 window.addEventListener('pageshow', function(e){
   if(e.persisted){
     var sm=document.getElementById('successModif');
-    if(sm) sm.style.display='none';
+    if(sm){ sm.style.cssText='display:none!important'; }
+    // Restaurer l'état normal du formulaire
+    var form=document.querySelector('.form-card');
+    if(form){ form.removeAttribute('style'); }
   }
 });
+
+/* Récupérer la langue choisie depuis index */
+(function(){
+  /* Priorité : paramètre URL > sessionStorage > français par défaut */
+  var lang = 'fr';
+  try{
+    var urlLang = new URLSearchParams(window.location.search).get('lang');
+    if(urlLang === 'en' || urlLang === 'fr') lang = urlLang;
+    else lang = sessionStorage.getItem('sarah_lang') || 'fr';
+  } catch(e){}
+  window._invLang = lang;
+
+  var T = {
+    fr:{
+      /* Écrans */
+      loading1:'Chargement de votre invitation…',
+      loading2:'Merci de patienter quelques secondes 💝',
+      errTitle:'Lien invalide',
+      errMsg:'Ce lien de modification est introuvable.<br>Vérifiez le lien reçu sur WhatsApp ou contactez l\'organisatrice.',
+      usedTitle:'Lien déjà utilisé',
+      usedMsg:'Vous avez déjà effectué votre modification.<br>Ce lien n\'est valable qu\'<strong>une seule fois</strong>.<br><br>Pour toute question, contactez directement l\'organisatrice.',
+      closedTitle:'Modifications closes',
+      closedMsg:'La date limite de modification était le <strong>17 juillet 2026</strong>.<br>Pour toute question, contactez directement l\'organisatrice.<br><br>À très bientôt pour fêter la petite Sarah 👑',
+      cancelledTitle:'Présence annulée',
+      cancelledMsg:'Votre présence a bien été annulée.<br>Sarah sera heureuse de savoir que vous pensiez à elle 💕<br><br>Si vous changez d\'avis, contactez l\'organisatrice.',
+      /* Carte principale */
+      cardBadge:'👑 Mon Invitation',
+      cardIntro:'Voici votre invitation pour la fête de <strong>Sarah</strong>',
+      deadline:'⏱️ Modifications possibles jusqu\'au <strong>&nbsp;17 juillet 2026</strong>',
+      /* Infos actuelles */
+      ciStatut:'Statut', ciGroupe:'Groupe', ciAdultes:'Adultes', ciEnfants:'Enfants',
+      /* Diviseur */
+      divider:'Modifier',
+      /* Formulaire */
+      presenceLabel:'Votre présence',
+      yesLabel:'Je serai là', yesSub:'présent·e',
+      noLabel:'Absent·e', noSub:'ne peut pas venir',
+      accompLabel:'Accompagnement',
+      seulLabel:'Seul·e', accompCard:'Accompagné·e',
+      adultesLabel:'👤 Adultes', adultesPh:'Nombre d\'adultes',
+      enfantsLabel:'🧒 Enfants', enfantsPh:'Nombre d\'enfants',
+      saveBtn:'✓ Enregistrer les modifications',
+      cancelBtn:'Annuler ma présence définitivement',
+      /* Confirmation annulation */
+      cancelConfirmMsg:'⚠️ Êtes-vous sûr·e de vouloir annuler votre présence ?<br>Cette action est irréversible.',
+      cancelYes:'Oui, annuler', cancelNo:'Non, garder',
+      /* Succès */
+      successTitle:'Modifications enregistrées !',
+      successMsg:'Vos informations ont bien été mises à jour.<br>On a hâte de vous accueillir pour fêter la petite Sarah 👑',
+      /* Toast */
+      toastOk:'Modifications enregistrées !', toastErr:'Erreur. Réessayez.',
+      /* Footer */
+      footerDate:'🌸 Sarah · 1 an · 18 Juillet 2026 · Yassa, Douala 🌸',
+      kinerty:'Contactez-nous pour vos projets en cliquant sur le lien ci-dessous'
+    },
+    en:{
+      /* Écrans */
+      loading1:'Loading your invitation…',
+      loading2:'Please wait a few seconds 💝',
+      errTitle:'Invalid link',
+      errMsg:'This modification link could not be found.<br>Check the link received on WhatsApp or contact the organizer.',
+      usedTitle:'Link already used',
+      usedMsg:'You have already made your modification.<br>This link is valid <strong>only once</strong>.<br><br>For any questions, contact the organizer directly.',
+      closedTitle:'Modifications closed',
+      closedMsg:'The modification deadline was <strong>July 17, 2026</strong>.<br>For any questions, contact the organizer directly.<br><br>See you soon to celebrate little Sarah 👑',
+      cancelledTitle:'Attendance cancelled',
+      cancelledMsg:'Your attendance has been cancelled.<br>Sarah will be happy to know you were thinking of her 💕<br><br>If you change your mind, contact the organizer.',
+      /* Carte principale */
+      cardBadge:'👑 My Invitation',
+      cardIntro:'Here is your invitation to <strong>Sarah\'s</strong> celebration',
+      deadline:'⏱️ Changes possible until <strong>&nbsp;July 17, 2026</strong>',
+      /* Infos actuelles */
+      ciStatut:'Status', ciGroupe:'Group', ciAdultes:'Adults', ciEnfants:'Children',
+      /* Diviseur */
+      divider:'Edit',
+      /* Formulaire */
+      presenceLabel:'Your attendance',
+      yesLabel:'I will be there', yesSub:'attending',
+      noLabel:'Not attending', noSub:'cannot come',
+      accompLabel:'Attendance type',
+      seulLabel:'Alone', accompCard:'With company',
+      adultesLabel:'👤 Adults', adultesPh:'Number of adults',
+      enfantsLabel:'🧒 Children', enfantsPh:'Number of children',
+      saveBtn:'✓ Save changes',
+      cancelBtn:'Cancel my attendance permanently',
+      /* Confirmation annulation */
+      cancelConfirmMsg:'⚠️ Are you sure you want to cancel your attendance?<br>This action is irreversible.',
+      cancelYes:'Yes, cancel', cancelNo:'No, keep',
+      /* Succès */
+      successTitle:'Changes saved!',
+      successMsg:'Your information has been updated.<br>We look forward to welcoming you to celebrate little Sarah 👑',
+      /* Toast */
+      toastOk:'Changes saved!', toastErr:'Error. Please try again.',
+      /* Footer */
+      footerDate:'🌸 Sarah · 1 year · July 18, 2026 · Yassa, Douala 🌸',
+      kinerty:'Contact us for your projects by clicking the link below'
+    }
+  };
+
+  function applyInvLang(){
+    var t = T[lang] || T.fr;
+    var $ = function(s){ return document.querySelector(s); };
+    var $$ = function(s){ return document.querySelectorAll(s); };
+
+    /* Écran loading */
+    var lp = $$('#screenLoading p');
+    if(lp[0]) lp[0].textContent = t.loading1;
+    if(lp[1]) lp[1].textContent = t.loading2;
+
+    /* Écrans erreur / statut */
+    var se = document.getElementById('screenError');
+    if(se){ var h=se.querySelector('h2'); if(h) h.textContent=t.errTitle; var p=se.querySelector('p'); if(p) p.innerHTML=t.errMsg; }
+    var su = document.getElementById('screenUsed');
+    if(su){ var h=su.querySelector('h2'); if(h) h.textContent=t.usedTitle; var p=su.querySelector('p'); if(p) p.innerHTML=t.usedMsg; }
+    var sc = document.getElementById('screenClosed');
+    if(sc){ var h=sc.querySelector('h2'); if(h) h.textContent=t.closedTitle; var p=sc.querySelector('p'); if(p) p.innerHTML=t.closedMsg; }
+    var sca = document.getElementById('screenCancelled');
+    if(sca){ var h=sca.querySelector('h2'); if(h) h.textContent=t.cancelledTitle; var p=sca.querySelector('p'); if(p) p.innerHTML=t.cancelledMsg; }
+
+    /* Carte principale */
+    var cb = $('.card-badge'); if(cb) cb.textContent = t.cardBadge;
+    var ci = $('.card-header p'); if(ci) ci.innerHTML = t.cardIntro;
+    var dn = $('.deadline-notice'); if(dn) dn.innerHTML = t.deadline;
+
+    /* Infos actuelles labels */
+    var ciLabels = $$('.ci-label');
+    if(ciLabels[0]) ciLabels[0].textContent = t.ciStatut;
+    if(ciLabels[1]) ciLabels[1].textContent = t.ciGroupe;
+    if(ciLabels[2]) ciLabels[2].textContent = t.ciAdultes;
+    if(ciLabels[3]) ciLabels[3].textContent = t.ciEnfants;
+
+    /* Diviseur */
+    var divSpan = $('.divider span'); if(divSpan) divSpan.textContent = t.divider;
+
+    /* Labels présence */
+    $$('.field label').forEach(function(l){
+      var tx = l.textContent.trim();
+      if(tx.match(/[Pp]r[eé]sence|[Aa]ttend/))    l.textContent = t.presenceLabel;
+      else if(tx.match(/[Aa]ccomp|[Aa]ttendance type/)) l.textContent = t.accompLabel;
+      else if(tx.match(/[Aa]dultes?|[Aa]dults?/)) l.textContent = t.adultesLabel;
+      else if(tx.match(/[Ee]nfants?|[Cc]hildren/)) l.textContent = t.enfantsLabel;
+    });
+
+    /* Radios présence */
+    var ouiLabel = document.getElementById('m-oui');
+    if(ouiLabel && ouiLabel.closest('.radio-opt')){
+      var card = ouiLabel.closest('.radio-opt').querySelector('.radio-card');
+      if(card){
+        var rl = card.querySelector('.r-label'); if(rl) rl.textContent = t.yesLabel;
+        var rs = card.querySelector('.r-sub');   if(rs) rs.textContent = t.yesSub;
+      }
+    }
+    var nonLabel = document.getElementById('m-non');
+    if(nonLabel && nonLabel.closest('.radio-opt')){
+      var card = nonLabel.closest('.radio-opt').querySelector('.radio-card');
+      if(card){
+        var rl = card.querySelector('.r-label'); if(rl) rl.textContent = t.noLabel;
+        var rs = card.querySelector('.r-sub');   if(rs) rs.textContent = t.noSub;
+      }
+    }
+
+    /* Radios accompagnement */
+    var seulEl = document.getElementById('m-seul');
+    if(seulEl && seulEl.closest('.radio-opt')){
+      var rl = seulEl.closest('.radio-opt').querySelector('.r-label'); if(rl) rl.textContent = t.seulLabel;
+    }
+    var accEl = document.getElementById('m-acc');
+    if(accEl && accEl.closest('.radio-opt')){
+      var rl = accEl.closest('.radio-opt').querySelector('.r-label'); if(rl) rl.textContent = t.accompCard;
+    }
+
+    /* Placeholders */
+    var ma = document.getElementById('m-adultes'); if(ma) ma.placeholder = t.adultesPh;
+    var me = document.getElementById('m-enfants'); if(me) me.placeholder = t.enfantsPh;
+
+    /* Boutons */
+    var sb = document.getElementById('btnSave'); if(sb) sb.innerHTML = t.saveBtn;
+    var cb2 = $('.btn-cancel'); if(cb2) cb2.textContent = t.cancelBtn;
+
+    /* Confirmation annulation */
+    var ccp = $('.confirm-cancel p'); if(ccp) ccp.innerHTML = t.cancelConfirmMsg;
+    var bcc = $('.btn-confirm-cancel'); if(bcc) bcc.textContent = t.cancelYes;
+    var bk  = $('.btn-keep');          if(bk)  bk.textContent  = t.cancelNo;
+
+    /* Succès */
+    var stitle = $('.success-modif h3'); if(stitle) stitle.textContent = t.successTitle;
+    var smsg   = $('.success-modif p');  if(smsg)   smsg.innerHTML     = t.successMsg;
+
+    /* Footer */
+    var footer = $('.page-footer');
+    if(footer){
+      var first = footer.firstChild;
+      if(first && first.nodeType===3) first.textContent = t.footerDate+' ';
+    }
+    var ks = footer ? footer.querySelector('span') : null;
+    if(ks) ks.textContent = t.kinerty;
+
+    /* Mémoriser pour usage dans les toasts JS */
+    window._T_inv = t;
+  }
+
+  document.addEventListener('DOMContentLoaded', applyInvLang);
+})();
 
 /* Warm-up Supabase */
 setTimeout(function(){
@@ -566,7 +772,7 @@ function onAccompChange(){
 
 /* ── SAUVEGARDER ── */
 async function saveModif(){
-  if(new Date() > DEADLINE){ toast('Modifications closes depuis le 17 juillet', 'err'); return; }
+  if(new Date() > DEADLINE){ toast((window._T_inv&&window._T_inv.closedTitle)||'Modifications closes', 'err'); return; }
 
   const btn = document.getElementById('btnSave');
   btn.disabled = true;
@@ -609,12 +815,12 @@ async function saveModif(){
     document.querySelector('.deadline-notice').style.display = 'none';
     document.getElementById('successModif').style.display = 'block';
     clearInterval(mdTimer);
-    toast('Modifications enregistrées !', 'ok');
+    toast((window._T_inv&&window._T_inv.toastOk)||'Modifications enregistrées !', 'ok');
 
   } catch(e){
     console.error(e);
     clearInterval(mdTimer);
-    toast('Erreur. Réessayez.', 'err');
+    toast((window._T_inv&&window._T_inv.toastErr)||'Erreur. Réessayez.', 'err');
     btn.disabled = false;
     btn.innerHTML = '&#x2713;&nbsp; Enregistrer les modifications';
   }
@@ -627,7 +833,7 @@ function toggleConfirmCancel(){
 }
 
 async function doCancel(){
-  if(new Date() > DEADLINE){ toast('Modifications closes depuis le 17 juillet', 'err'); return; }
+  if(new Date() > DEADLINE){ toast((window._T_inv&&window._T_inv.closedTitle)||'Modifications closes', 'err'); return; }
 
   try {
     const res = await fetch(
@@ -648,7 +854,7 @@ async function doCancel(){
     showScreen('screenCancelled');
   } catch(e){
     console.error(e);
-    toast('Erreur. Réessayez.', 'err');
+    toast((window._T_inv&&window._T_inv.toastErr)||'Erreur. Réessayez.', 'err');
   }
 }
 </script>
