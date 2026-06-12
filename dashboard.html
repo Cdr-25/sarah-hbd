@@ -542,9 +542,9 @@ function renderAll(data){
   // Stats
   const total   = data.length;
   const present = data.filter(r=>r.presence==='oui').length;
-  const adults  = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_adultes||1),0);
+  const adults  = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_adultes||0),0);
   const kids    = data.filter(r=>r.presence==='oui').reduce((s,r)=>s+parseInt(r.nb_enfants||0),0);
-    const guests  = adults + kids;
+    const guests  = present + adults + kids;
 
     animCount('statTotal',      total);
     animCount('statPresent',    present);
@@ -609,7 +609,7 @@ function renderTable(data){
       </td>
       <td>${statusBadge}</td>
       <td>${groupBadge}</td>
-      <td style="font-weight:600;color:var(--gold);">${r.nb_adultes || 1}</td>
+      <td style="font-weight:600;color:var(--gold);">${r.nb_adultes || 0}</td>
       <td style="font-weight:600;color:var(--rose-deep);">${r.nb_enfants || 0}</td>
       <td class="msg-cell">${msgCell}</td>
       <td class="date-cell">${dateStr}</td>
