@@ -501,6 +501,14 @@ window.addEventListener('pageshow', function(e){
       successMsg:'Vos informations ont bien été mises à jour.<br>On a hâte de vous accueillir pour fêter la petite Sarah 👑',
       /* Toast */
       toastOk:'Modifications enregistrées !', toastErr:'Erreur. Réessayez.',
+      /* Statuts */
+      ciStatutPresent:'✓ Présence confirmée', ciStatutAbsent:'✗ Absent·e',
+      ciGroupeOui:'Avec accompagnants', ciGroupeSeul:'Seul·e',
+      /* Timeout */
+      slowLoad:'Chargement lent…', slowLoadMsg:'La connexion a pris trop de temps.',
+      retryBtn:'Réessayer',
+      /* Bouton saving */
+      savingBtn:'⏳ Enregistrement',
       /* Footer */
       footerDate:'🌸 Sarah · 1 an · 18 Juillet 2026 · Yassa, Douala 🌸',
       kinerty:'Contactez-nous pour vos projets en cliquant sur le lien ci-dessous'
@@ -543,6 +551,14 @@ window.addEventListener('pageshow', function(e){
       successMsg:'Your information has been updated.<br>We look forward to welcoming you to celebrate little Sarah 👑',
       /* Toast */
       toastOk:'Changes saved!', toastErr:'Error. Please try again.',
+      /* Statuts */
+      ciStatutPresent:'✓ Attendance confirmed', ciStatutAbsent:'✗ Not attending',
+      ciGroupeOui:'With company', ciGroupeSeul:'Alone',
+      /* Timeout */
+      slowLoad:'Loading slowly…', slowLoadMsg:'The connection took too long.',
+      retryBtn:'Try again',
+      /* Bouton saving */
+      savingBtn:'⏳ Saving',
       /* Footer */
       footerDate:'🌸 Sarah · 1 year · July 18, 2026 · Yassa, Douala 🌸',
       kinerty:'Contact us for your projects by clicking the link below'
@@ -719,8 +735,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.error(e);
     if(e.name === 'AbortError'){
       // Timeout — proposer de réessayer
-      document.getElementById('screenError').querySelector('h2').textContent = 'Chargement lent…';
-      document.getElementById('screenError').querySelector('p').innerHTML = 'La connexion a pris trop de temps.<br><button onclick="location.reload()" style="margin-top:12px;padding:10px 20px;background:var(--rose);color:white;border:none;border-radius:10px;cursor:pointer;font-family:Jost,sans-serif">Réessayer</button>';
+      var _te = window._T_inv || {};
+      document.getElementById('screenError').querySelector('h2').textContent = _te.slowLoad || 'Chargement lent…';
+      document.getElementById('screenError').querySelector('p').innerHTML = (_te.slowLoadMsg || 'La connexion a pris trop de temps.')+'<br><button onclick="location.reload()" style="margin-top:12px;padding:10px 20px;background:var(--rose);color:white;border:none;border-radius:10px;cursor:pointer;font-family:Jost,sans-serif">'+(_te.retryBtn||'Réessayer')+'</button>';
     }
     showScreen('screenError');
   }
@@ -728,12 +745,18 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 /* ── POPULATE ── */
 function populateForm(d){
-  // Nom
-  document.getElementById('guestName').textContent = 'Bonjour, ' + d.prenom + ' !';
+  // Nom — bilingue
+  var _t = window._T_inv || {};
+  var greeting = (window._invLang === 'en') ? 'Hello, ' : 'Bonjour, ';
+  document.getElementById('guestName').textContent = greeting + d.prenom + ' !';
 
-  // Infos actuelles
-  document.getElementById('ciStatut').textContent  = d.presence === 'oui' ? '✓ Présence confirmée' : '✗ Absent·e';
-  document.getElementById('ciGroupe').textContent  = d.accompagne === 'oui' ? 'Avec accompagnants' : 'Seul·e';
+  // Infos actuelles — bilingue
+  document.getElementById('ciStatut').textContent  = d.presence === 'oui'
+    ? (_t.ciStatutPresent || '✓ Présence confirmée')
+    : (_t.ciStatutAbsent  || '✗ Absent·e');
+  document.getElementById('ciGroupe').textContent  = d.accompagne === 'oui'
+    ? (_t.ciGroupeOui || 'Avec accompagnants')
+    : (_t.ciGroupeSeul || 'Seul·e');
   document.getElementById('ciAdultes').textContent = d.nb_adultes || 1;
   document.getElementById('ciEnfants').textContent = d.nb_enfants || 0;
 
@@ -776,7 +799,7 @@ async function saveModif(){
 
   const btn = document.getElementById('btnSave');
   btn.disabled = true;
-  btn.innerHTML = '⏳ Enregistrement<span id="mdots"></span>';
+  btn.innerHTML = ((window._T_inv&&window._T_inv.savingBtn)||'⏳ Enregistrement')+'<span id="mdots"></span>';
   const mdotsEl = document.getElementById('mdots'); let md=0;
   const mdTimer = setInterval(function(){ md=(md+1)%4; mdotsEl.textContent='.'.repeat(md); }, 400);
 
@@ -804,8 +827,13 @@ async function saveModif(){
     if(!res.ok){ throw new Error(await res.text()); }
 
     // Mettre à jour l'affichage
-    document.getElementById('ciStatut').textContent  = presence === 'oui' ? '✓ Présence confirmée' : '✗ Absent·e';
-    document.getElementById('ciGroupe').textContent  = accompagne === 'oui' ? 'Avec accompagnants' : 'Seul·e';
+    var _ts = window._T_inv || {};
+    document.getElementById('ciStatut').textContent  = presence === 'oui'
+      ? (_ts.ciStatutPresent || '✓ Présence confirmée')
+      : (_ts.ciStatutAbsent  || '✗ Absent·e');
+    document.getElementById('ciGroupe').textContent  = accompagne === 'oui'
+      ? (_ts.ciGroupeOui || 'Avec accompagnants')
+      : (_ts.ciGroupeSeul || 'Seul·e');
     document.getElementById('ciAdultes').textContent = nbAdultes;
     document.getElementById('ciEnfants').textContent = nbEnfants;
 
@@ -822,7 +850,7 @@ async function saveModif(){
     clearInterval(mdTimer);
     toast((window._T_inv&&window._T_inv.toastErr)||'Erreur. Réessayez.', 'err');
     btn.disabled = false;
-    btn.innerHTML = '&#x2713;&nbsp; Enregistrer les modifications';
+    btn.innerHTML = (window._T_inv&&window._T_inv.saveBtn)||'&#x2713;&nbsp; Enregistrer les modifications';
   }
 }
 
