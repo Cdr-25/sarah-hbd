@@ -528,7 +528,7 @@ function populateForm(d){
   // Infos actuelles
   document.getElementById('ciStatut').textContent  = d.presence === 'oui' ? '✓ Présence confirmée' : '✗ Absent·e';
   document.getElementById('ciGroupe').textContent  = d.accompagne === 'oui' ? 'Avec accompagnants' : 'Seul·e';
-  document.getElementById('ciAdultes').textContent = d.nb_adultes || 1;
+  document.getElementById('ciAdultes').textContent = d.nb_adultes || 0;
   document.getElementById('ciEnfants').textContent = d.nb_enfants || 0;
 
   // Pré-remplir formulaire
@@ -537,7 +537,7 @@ function populateForm(d){
 
   if(d.accompagne === 'oui'){
     document.getElementById('m-acc').checked = true;
-    document.getElementById('m-adultes').value = d.nb_adultes || 1;
+    document.getElementById('m-adultes').value = d.nb_adultes || 0;
     document.getElementById('m-enfants').value = d.nb_enfants || 0;
   } else {
     document.getElementById('m-seul').checked = true;
