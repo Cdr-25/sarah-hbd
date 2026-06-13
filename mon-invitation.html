@@ -576,7 +576,7 @@ async function saveModif(){
 
   const presence   = document.querySelector('input[name=presence]:checked')?.value || 'non';
   const accompagne = document.querySelector('input[name=accompagne]:checked')?.value || 'seul';
-  const nbAdultes  = accompagne === 'oui' ? parseInt(document.getElementById('m-adultes').value || '1') : 1;
+  const nbAdultes  = accompagne === 'oui' ? parseInt(document.getElementById('m-adultes').value || '0') : 0;
   const nbEnfants  = accompagne === 'oui' ? parseInt(document.getElementById('m-enfants').value  || '0') : 0;
 
   const updates = { presence, accompagne, nb_adultes: nbAdultes, nb_enfants: nbEnfants, modifie: true };
