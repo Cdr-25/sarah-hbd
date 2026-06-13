@@ -790,7 +790,7 @@ document.getElementById('rsvpForm').addEventListener('submit',async function(e){
   var dotsTimer=setInterval(function(){d=(d+1)%4;dotsEl.textContent='.'.repeat(d);},400);
   var presence=(document.querySelector('input[name=presence]:checked')||{}).value||'oui';
   var ac=(document.querySelector('input[name=accompagne]:checked')||{}).value||'seul';
-  var nbA=ac==='oui'?parseInt(document.getElementById('nb-adultes').value||1):1;
+  var nbA=ac==='oui'?parseInt(document.getElementById('nb-adultes').value||0):0;
   var nbE=ac==='oui'?parseInt(document.getElementById('nb-enfants').value||0):0;
   var token = createToken();
   var prenom=document.getElementById('prenom').value.trim();
