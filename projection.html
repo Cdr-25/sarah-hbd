@@ -201,16 +201,17 @@ html,body{
 }
 .ambient-veil.show{ opacity:1; }
 
-/* ── START OVERLAY (tap pour démarrer) ── */
+/* ── START OVERLAY (n'apparaît que si le son est bloqué par le navigateur) ── */
 .start-overlay{
   position:fixed;inset:0;z-index:50;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:22px;text-align:center;padding:40px;
   background:linear-gradient(160deg,#2c1420 0%,#1a0e13 60%,#241119 100%);
   cursor:pointer;
+  opacity:0;pointer-events:none;
   transition:opacity .5s ease;
 }
-.start-overlay.hidden{ opacity:0;pointer-events:none; }
+.start-overlay.visible{ opacity:1;pointer-events:auto; }
 .start-overlay-icon{ font-size:clamp(3rem,8vw,5.5rem); animation:float 3s ease-in-out infinite; font-family:var(--emoji-fonts); }
 .start-overlay-title{
   font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
@@ -429,6 +430,31 @@ let currentUtterance = null;
 // ancienne est encore "en vol" (annulée mais dont les évènements arrivent
 // en retard), les callbacks de l'ancienne deviennent inoffensifs.
 let speechToken = 0;
+// Devient vrai dès qu'un premier son a réellement été entendu (évènement
+// "onstart" d'une utterance). Tant que c'est faux, une erreur 'not-allowed'
+// signifie que le navigateur bloque encore tout son.
+let audioUnlocked = false;
+function hideStartOverlay(){
+  const ov = document.getElementById('startOverlay');
+  if(!ov) return;
+  ov.classList.remove('visible');
+}
+// Le son est bloqué par le navigateur : on arrête tout défilement
+// automatique et on affiche l'écran "Touchez pour démarrer". Un seul tap
+// suffit à débloquer le son pour le reste de la projection.
+function handleAudioBlocked(){
+  if(timer) clearTimeout(timer);
+  const ov = document.getElementById('startOverlay');
+  if(!ov) return;
+  ov.classList.add('visible');
+  const retry = () => {
+    ov.classList.remove('visible');
+    if(phase === 'intro' || phase === 'waiting'){ startShow(); }
+    else { showMessage(msgIdx); }
+  };
+  ov.addEventListener('click', retry, { once:true });
+  ov.addEventListener('touchstart', retry, { once:true, passive:true });
+}
 function speak(text, onend){
   if(!voiceEnabled || !window.speechSynthesis){ if(onend) onend(); return; }
   const myToken = ++speechToken;
@@ -441,6 +467,7 @@ function speak(text, onend){
     if(myToken !== speechToken || done) return;
     done = true;
     speechUnlocked = true;
+    audioUnlocked = true;
     currentUtterance = null;
     if(onend) onend();
   };
@@ -462,8 +489,21 @@ function speak(text, onend){
       i++;
       speakNext();
     };
+    utter.onstart = () => { audioUnlocked = true; hideStartOverlay(); };
     utter.onend = nextChunk;
-    utter.onerror = nextChunk;
+    utter.onerror = (ev) => {
+      // 'not-allowed' = le navigateur refuse de jouer le moindre son tant
+      // qu'aucun geste utilisateur n'a eu lieu (autoplay bloqué). Dans ce
+      // cas précis, on n'enchaîne SURTOUT PAS sur le morceau/message
+      // suivant (c'est ce qui causait le défilement en rafale) : on met la
+      // projection en pause et on affiche l'écran "Touchez pour démarrer",
+      // qui relance la lecture du message actuel dès le tap.
+      if(!audioUnlocked && ev && ev.error === 'not-allowed'){
+        handleAudioBlocked();
+        return;
+      }
+      nextChunk();
+    };
     // Filet PAR PHRASE : si ce morceau reste bloqué (bug ponctuel du moteur
     // vocal du navigateur), on passe quand même au suivant au lieu de
     // figer toute la voix off pour le reste de la projection.
@@ -606,27 +646,9 @@ try{
   });
   window.addEventListener('resize', ()=>{ if(typeof phase !== 'undefined' && phase==='messages') fitMessage(); });
 
-  fetchMessages();                // les données arrivent en tâche de fond, dès l'ouverture de la page
+  startShow();                    // l'intro démarre immédiatement, sans écran de chargement
+  fetchMessages();                // les données arrivent en tâche de fond
   setInterval(fetchMessages, REFRESH_MS);
-
-  // La projection (et la voix off) ne démarre qu'après un vrai tap/clic de
-  // la personne : c'est le seul moyen fiable de garantir que le navigateur
-  // autorise le son dès le premier message, au lieu de bloquer la voix et
-  // de faire défiler tous les messages en rafale.
-  const startOverlay = document.getElementById('startOverlay');
-  const beginShow = () => {
-    if(startOverlay){
-      startOverlay.classList.add('hidden');
-      setTimeout(()=>{ startOverlay.remove(); }, 550);
-    }
-    startShow();
-  };
-  if(startOverlay){
-    startOverlay.addEventListener('click', beginShow, { once:true });
-    startOverlay.addEventListener('touchstart', beginShow, { once:true, passive:true });
-  } else {
-    startShow();
-  }
 }catch(e){
   console.error('Erreur au démarrage de la projection :', e);
 }
