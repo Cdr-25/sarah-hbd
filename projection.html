@@ -201,27 +201,6 @@ html,body{
 }
 .ambient-veil.show{ opacity:1; }
 
-/* ── START OVERLAY (n'apparaît que si le son est bloqué par le navigateur) ── */
-.start-overlay{
-  position:fixed;inset:0;z-index:50;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:22px;text-align:center;padding:40px;
-  background:linear-gradient(160deg,#2c1420 0%,#1a0e13 60%,#241119 100%);
-  cursor:pointer;
-  opacity:0;pointer-events:none;
-  transition:opacity .5s ease;
-}
-.start-overlay.visible{ opacity:1;pointer-events:auto; }
-.start-overlay-icon{ font-size:clamp(3rem,8vw,5.5rem); animation:float 3s ease-in-out infinite; font-family:var(--emoji-fonts); }
-.start-overlay-title{
-  font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
-  font-size:clamp(1.3rem,3.6vw,2.2rem);color:#fff;
-}
-.start-overlay-sub{
-  font-size:clamp(.7rem,1.6vw,.95rem);letter-spacing:.15em;text-transform:uppercase;
-  color:rgba(252,232,239,.65);
-}
-
 /* ── EMPTY STATE ── */
 .empty-message{
   font-family:'Playfair Display',serif;
@@ -265,15 +244,6 @@ html,body{
 </style>
 </head>
 <body>
-
-<!-- ÉCRAN DE DÉMARRAGE : garantit un vrai geste utilisateur avant de lancer
-     la voix off, sinon les navigateurs bloquent le son et la projection
-     défile en rafale sans jamais lire les messages à voix haute. -->
-<div class="start-overlay" id="startOverlay">
-  <div class="start-overlay-icon">🤍</div>
-  <div class="start-overlay-title">Les messages pour Sarah</div>
-  <div class="start-overlay-sub">Touchez l'écran pour démarrer</div>
-</div>
 
 <canvas id="canvas"></canvas>
 <div class="bg-glow"></div>
@@ -432,29 +402,10 @@ let currentUtterance = null;
 let speechToken = 0;
 // Devient vrai dès qu'un premier son a réellement été entendu (évènement
 // "onstart" d'une utterance). Tant que c'est faux, une erreur 'not-allowed'
-// signifie que le navigateur bloque encore tout son.
+// signifie que le navigateur bloque encore tout son : dans ce cas on ne
+// force JAMAIS d'interaction, on laisse simplement le rythme d'affichage
+// normal (basé sur le texte) continuer en silence pour ce message.
 let audioUnlocked = false;
-function hideStartOverlay(){
-  const ov = document.getElementById('startOverlay');
-  if(!ov) return;
-  ov.classList.remove('visible');
-}
-// Le son est bloqué par le navigateur : on arrête tout défilement
-// automatique et on affiche l'écran "Touchez pour démarrer". Un seul tap
-// suffit à débloquer le son pour le reste de la projection.
-function handleAudioBlocked(){
-  if(timer) clearTimeout(timer);
-  const ov = document.getElementById('startOverlay');
-  if(!ov) return;
-  ov.classList.add('visible');
-  const retry = () => {
-    ov.classList.remove('visible');
-    if(phase === 'intro' || phase === 'waiting'){ startShow(); }
-    else { showMessage(msgIdx); }
-  };
-  ov.addEventListener('click', retry, { once:true });
-  ov.addEventListener('touchstart', retry, { once:true, passive:true });
-}
 function speak(text, onend){
   if(!voiceEnabled || !window.speechSynthesis){ if(onend) onend(); return; }
   const myToken = ++speechToken;
@@ -489,17 +440,17 @@ function speak(text, onend){
       i++;
       speakNext();
     };
-    utter.onstart = () => { audioUnlocked = true; hideStartOverlay(); };
+    utter.onstart = () => { audioUnlocked = true; };
     utter.onend = nextChunk;
     utter.onerror = (ev) => {
-      // 'not-allowed' = le navigateur refuse de jouer le moindre son tant
-      // qu'aucun geste utilisateur n'a eu lieu (autoplay bloqué). Dans ce
-      // cas précis, on n'enchaîne SURTOUT PAS sur le morceau/message
-      // suivant (c'est ce qui causait le défilement en rafale) : on met la
-      // projection en pause et on affiche l'écran "Touchez pour démarrer",
-      // qui relance la lecture du message actuel dès le tap.
+      // 'not-allowed' = le navigateur refuse tout son tant qu'aucune
+      // interaction n'a eu lieu. On n'enchaîne SURTOUT PAS immédiatement
+      // sur le morceau/message suivant (c'est ce qui causait le défilement
+      // en rafale) : on arrête juste d'insister ici, en silence, sans rien
+      // demander à personne. Le minutage normal basé sur le texte (déjà
+      // programmé dans showMessage/startShow) prendra le relais tout seul,
+      // au bon rythme, avec ou sans son.
       if(!audioUnlocked && ev && ev.error === 'not-allowed'){
-        handleAudioBlocked();
         return;
       }
       nextChunk();
