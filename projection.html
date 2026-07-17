@@ -340,7 +340,18 @@ function pickFrenchVoice(){
 if (window.speechSynthesis){
   pickFrenchVoice();
   speechSynthesis.onvoiceschanged = pickFrenchVoice;
+  // Contourne un bug connu de Chrome/Edge sur ordinateur : le moteur vocal
+  // met parfois du temps à "s'activer" après le chargement de la page, ce
+  // qui fait que le tout premier vrai speak() reste silencieux. Envoyer
+  // une phrase vide (volume 0) dès le chargement réveille le moteur pour
+  // de bon, sans qu'aucune interaction ne soit nécessaire.
+  try{
+    const warmup = new SpeechSynthesisUtterance(' ');
+    warmup.volume = 0;
+    speechSynthesis.speak(warmup);
+  }catch(e){}
 }
+
 // Retire les emoji (et symboles pictographiques) avant lecture : la voix
 // off ne doit lire que du texte, jamais "cœur rouge" ou "visage qui rit".
 function stripEmojis(text){
@@ -440,7 +451,8 @@ function speak(text, onend){
       i++;
       speakNext();
     };
-    utter.onstart = () => { audioUnlocked = true; };
+    let started = false;
+    utter.onstart = () => { started = true; audioUnlocked = true; clearInterval(kick); };
     utter.onend = nextChunk;
     utter.onerror = (ev) => {
       // 'not-allowed' = le navigateur refuse tout son tant qu'aucune
@@ -451,14 +463,30 @@ function speak(text, onend){
       // programmé dans showMessage/startShow) prendra le relais tout seul,
       // au bon rythme, avec ou sans son.
       if(!audioUnlocked && ev && ev.error === 'not-allowed'){
+        clearInterval(kick);
         return;
       }
+      clearInterval(kick);
       nextChunk();
     };
     // Filet PAR PHRASE : si ce morceau reste bloqué (bug ponctuel du moteur
     // vocal du navigateur), on passe quand même au suivant au lieu de
     // figer toute la voix off pour le reste de la projection.
     const watchdog = setTimeout(nextChunk, estimateSpeechMs(chunks[i]) + 4000);
+    // Contourne un bug connu de Chrome/Edge sur ordinateur : le tout
+    // premier speak() d'une page fraîchement chargée est parfois
+    // silencieusement ignoré (aucun son, mais aucune erreur non plus). Si
+    // rien ne s'est vraiment mis à parler après un court instant, on
+    // relance nous-mêmes la même phrase automatiquement — sans jamais
+    // demander de clic à personne.
+    let kickTries = 0;
+    const kick = setInterval(() => {
+      if(myToken !== speechToken || started || chunkDone){ clearInterval(kick); return; }
+      kickTries++;
+      if(kickTries > 5){ clearInterval(kick); return; }
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }, 700);
     speechSynthesis.speak(utter);
   }
   // Petit délai après cancel() : contourne un bug connu où Chrome ignore un
