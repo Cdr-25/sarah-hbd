@@ -241,33 +241,6 @@ html,body{
 .ctrl-btn:hover{ background:rgba(255,255,255,.22); transform:scale(1.08); }
 .ctrl-btn:active{ transform:scale(.92); }
 .ctrl-btn.ctrl-replay{ width:42px;height:42px;font-size:1.15rem; }
-
-/* ── INVITATION À ACTIVER LE SON (tant que ce n'est pas encore fait) ── */
-.sound-prompt{
-  position:fixed;bottom:24px;left:24px;z-index:12;
-  display:flex;align-items:center;gap:12px;
-  padding:10px 20px 10px 10px;border-radius:50px;
-  background:rgba(232,128,158,.18);
-  border:1px solid rgba(232,128,158,.55);
-  backdrop-filter:blur(6px);
-  cursor:pointer;
-  animation:soundPromptPulse 1.8s ease-in-out infinite;
-  transition:opacity .4s ease, transform .4s ease;
-}
-.sound-prompt.gone{ opacity:0;transform:scale(.9);pointer-events:none; }
-.sound-prompt-icon{
-  width:40px;height:40px;border-radius:50%;
-  background:rgba(232,128,158,.35);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.15rem;flex-shrink:0;
-}
-.sound-prompt-text{
-  color:#fff;font-weight:600;font-size:.85rem;letter-spacing:.02em;white-space:nowrap;
-}
-@keyframes soundPromptPulse{
-  0%,100%{ box-shadow:0 0 0 0 rgba(232,128,158,.45); }
-  50%{ box-shadow:0 0 0 10px rgba(232,128,158,0); }
-}
 </style>
 </head>
 <body>
@@ -281,16 +254,6 @@ html,body{
   <button class="ctrl-btn ctrl-replay" id="replayBtn" title="Rejouer depuis le début">⟲</button>
   <button class="ctrl-btn" id="nextBtn" title="Message suivant">▶</button>
   <button class="ctrl-btn" id="voiceBtn" title="Activer la voix off">🔇</button>
-</div>
-
-<!-- INVITATION BIEN VISIBLE À ACTIVER LE SON : le navigateur exige un clic
-     humain avant d'autoriser la voix off. Ce bouton sert à la fois
-     d'indicateur clair ("le son est coupé") et de déclencheur : un clic
-     l'active ET lance la lecture immédiatement. Il disparaît une fois
-     cliqué. -->
-<div class="sound-prompt" id="soundPrompt" title="Activer le son">
-  <div class="sound-prompt-icon">🔇</div>
-  <div class="sound-prompt-text">Cliquez pour activer le son</div>
 </div>
 
 <!-- TICKER -->
@@ -574,8 +537,6 @@ function toggleVoice(){
     btn.textContent = voiceEnabled ? '🔊' : '🔇';
     btn.title = voiceEnabled ? 'Couper la voix off' : 'Activer la voix off';
   }
-  const soundPrompt = document.getElementById('soundPrompt');
-  if (soundPrompt && voiceEnabled) soundPrompt.classList.add('gone');
   if (!voiceEnabled && window.speechSynthesis){
     speechToken++; // invalide toute lecture en cours / callbacks en retard
     currentUtterance = null;
@@ -656,14 +617,6 @@ try{
   if(nextBtn)   nextBtn.addEventListener('click', () => goNext());
   if(prevBtn)   prevBtn.addEventListener('click', () => goPrev());
   if(voiceBtn)  voiceBtn.addEventListener('click', () => toggleVoice());
-
-  const soundPrompt = document.getElementById('soundPrompt');
-  if(soundPrompt){
-    soundPrompt.addEventListener('click', () => {
-      soundPrompt.classList.add('gone');
-      if(!voiceEnabled) toggleVoice(); // active le son et lance la lecture immédiatement
-    });
-  }
 
   document.addEventListener('keydown', e=>{
     if(e.key==='ArrowRight'){ goNext(); }
