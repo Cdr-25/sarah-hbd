@@ -1,6 +1,7 @@
 {
   "routes": [
     { "src": "/mon-invitation", "dest": "/mon-invitation.html" },
-    { "src": "/dashboard", "dest": "/dashboard.html" }
+    { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/projection", "dest": "/projection.html" }
   ]
 }
