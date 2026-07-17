@@ -55,9 +55,7 @@ html,body{
 
 /* ── COUNTER ── */
 .msg-counter{
-  position:fixed;top:52px;right:32px;z-index:10;
-  font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(252,232,239,.55);
+  display:none;
 }
 
 /* ── SLIDES ── */
@@ -203,6 +201,26 @@ html,body{
 }
 .ambient-veil.show{ opacity:1; }
 
+/* ── START OVERLAY (tap pour démarrer) ── */
+.start-overlay{
+  position:fixed;inset:0;z-index:50;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;text-align:center;padding:40px;
+  background:linear-gradient(160deg,#2c1420 0%,#1a0e13 60%,#241119 100%);
+  cursor:pointer;
+  transition:opacity .5s ease;
+}
+.start-overlay.hidden{ opacity:0;pointer-events:none; }
+.start-overlay-icon{ font-size:clamp(3rem,8vw,5.5rem); animation:float 3s ease-in-out infinite; font-family:var(--emoji-fonts); }
+.start-overlay-title{
+  font-family:'Playfair Display',serif;font-weight:900;font-style:italic;
+  font-size:clamp(1.3rem,3.6vw,2.2rem);color:#fff;
+}
+.start-overlay-sub{
+  font-size:clamp(.7rem,1.6vw,.95rem);letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(252,232,239,.65);
+}
+
 /* ── EMPTY STATE ── */
 .empty-message{
   font-family:'Playfair Display',serif;
@@ -246,6 +264,15 @@ html,body{
 </style>
 </head>
 <body>
+
+<!-- ÉCRAN DE DÉMARRAGE : garantit un vrai geste utilisateur avant de lancer
+     la voix off, sinon les navigateurs bloquent le son et la projection
+     défile en rafale sans jamais lire les messages à voix haute. -->
+<div class="start-overlay" id="startOverlay">
+  <div class="start-overlay-icon">🤍</div>
+  <div class="start-overlay-title">Les messages pour Sarah</div>
+  <div class="start-overlay-sub">Touchez l'écran pour démarrer</div>
+</div>
 
 <canvas id="canvas"></canvas>
 <div class="bg-glow"></div>
@@ -358,6 +385,19 @@ function estimateSpeechMs(text){
   const words = (text || '').trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1500, words * 400) + 1500;
 }
+// Retire la ponctuation avant de donner le texte à la voix off : certaines
+// voix (notamment les voix locales basiques) prononcent littéralement les
+// signes de ponctuation ("point", "virgule", "point d'exclamation"...). On
+// les enlève une fois les phrases déjà découpées (voir plus bas), pour ne
+// jamais entendre autre chose que les mots du message. L'apostrophe est
+// volontairement conservée pour ne pas casser les élisions ("aujourd'hui",
+// "l'amour").
+function stripPunctuationForSpeech(text){
+  return (text || '')
+    .replace(/[.,;:!?«»""()\[\]{}…—–\-_/\\|~^*+=<>@#%]/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
 // Découpe un texte en phrases courtes : les navigateurs (Chrome en tête)
 // ont un bug connu où une lecture vocale continue s'arrête SILENCIEUSEMENT
 // au bout d'environ 15 secondes sur un texte trop long. En lisant phrase
@@ -407,7 +447,7 @@ function speak(text, onend){
   function speakNext(){
     if(myToken !== speechToken) return; // une lecture plus récente a pris le relais
     if(i >= chunks.length){ finish(); return; }
-    const utter = new SpeechSynthesisUtterance(chunks[i]);
+    const utter = new SpeechSynthesisUtterance(stripPunctuationForSpeech(chunks[i]));
     utter.lang = 'fr-FR';
     if (frVoice) utter.voice = frVoice;
     utter.volume = 1;   // volume maximal
@@ -566,9 +606,27 @@ try{
   });
   window.addEventListener('resize', ()=>{ if(typeof phase !== 'undefined' && phase==='messages') fitMessage(); });
 
-  startShow();                    // l'intro démarre immédiatement, sans écran de chargement
-  fetchMessages();                // les données arrivent en tâche de fond
+  fetchMessages();                // les données arrivent en tâche de fond, dès l'ouverture de la page
   setInterval(fetchMessages, REFRESH_MS);
+
+  // La projection (et la voix off) ne démarre qu'après un vrai tap/clic de
+  // la personne : c'est le seul moyen fiable de garantir que le navigateur
+  // autorise le son dès le premier message, au lieu de bloquer la voix et
+  // de faire défiler tous les messages en rafale.
+  const startOverlay = document.getElementById('startOverlay');
+  const beginShow = () => {
+    if(startOverlay){
+      startOverlay.classList.add('hidden');
+      setTimeout(()=>{ startOverlay.remove(); }, 550);
+    }
+    startShow();
+  };
+  if(startOverlay){
+    startOverlay.addEventListener('click', beginShow, { once:true });
+    startOverlay.addEventListener('touchstart', beginShow, { once:true, passive:true });
+  } else {
+    startShow();
+  }
 }catch(e){
   console.error('Erreur au démarrage de la projection :', e);
 }
